@@ -10,6 +10,7 @@ require (
 	github.com/antchfx/htmlquery v1.0.0 // indirect
 	github.com/antchfx/xmlquery v1.0.0 // indirect
 	github.com/antchfx/xpath v1.0.0 // indirect
+	github.com/armon/go-metrics v0.0.0-20190430140413-ec5e00d3c878 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/coreos/bbolt v1.3.3 // indirect
 	github.com/coreos/etcd v3.3.15+incompatible
@@ -23,13 +24,17 @@ require (
 	github.com/gocolly/colly v1.2.0
 	github.com/gogo/protobuf v1.3.0
 	github.com/golang/groupcache v0.0.0-20191002201903-404acd9df4cc // indirect
-	github.com/golang/protobuf v1.3.2
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.11.3 // indirect
+	github.com/hashicorp/consul/api v1.2.0
+	github.com/hashicorp/go-immutable-radix v1.1.0 // indirect
+	github.com/hashicorp/go-rootcerts v1.0.1 // indirect
+	github.com/hashicorp/golang-lru v0.5.3 // indirect
+	github.com/hashicorp/serf v0.8.5 // indirect
 	github.com/henrylee2cn/cfgo v0.0.0-20180417024816-e6c3cc325b21 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20190925102525-a28b3dc837cc // indirect
 	github.com/henrylee2cn/teleport v5.0.0+incompatible
