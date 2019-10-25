@@ -1,4 +1,4 @@
-module gocore
+module github.com/ifls/gocore
 
 go 1.13
 
