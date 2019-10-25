@@ -5,8 +5,20 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"go.uber.org/zap"
 	"gocore/util"
+	"log"
 	"testing"
 )
+
+var ip string = "47.107.151.251"
+
+func init() {
+	redisUrl = ip + ":6379"
+	_, err := Open(redisUrl)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
 
 func TestRedisConn(t *testing.T) {
 	c, err := redis.Dial("tcp", redisUrl)

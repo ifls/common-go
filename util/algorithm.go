@@ -15,3 +15,7 @@ func BubbleSort(array *[]int) {
 		}
 	}
 }
+
+func isPalindrome() {
+
+}

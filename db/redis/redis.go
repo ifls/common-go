@@ -9,18 +9,13 @@ var redisClient redis.Conn
 
 var redisUrl string
 
-func init() {
-	redisUrl = ""
-	redisClient, _ = Open(redisUrl)
-}
-
 func Open(addr string) (redis.Conn, error) {
 	cli, err := redis.Dial("tcp", addr)
 	if err != nil {
 		util.LogErr(err)
 		return nil, err
 	}
-
+	redisClient = cli
 	return cli, nil
 }
 

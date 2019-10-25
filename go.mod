@@ -46,6 +46,7 @@ require (
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
 	github.com/ssdb/gossdb v0.0.0-20180723034631-88f6b59b84ec
+	github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	github.com/tidwall/gjson v1.3.2 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
