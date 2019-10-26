@@ -3,15 +3,14 @@ package redis
 import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
-	"github.com/ifls/gocore/util"
-	"go.uber.org/zap"
+	"github.com/stretchr/testify/assert"
 	"log"
+	"strconv"
 	"testing"
 )
 
-var ip string = "47.107.151.251"
-
 func init() {
+	ip := "47.107.151.251"
 	redisUrl = ip + ":6379"
 	_, err := Open(redisUrl)
 	if err != nil {
@@ -49,76 +48,145 @@ func TestRedisConn(t *testing.T) {
 	//}
 
 	//err = hmset(c, "hash_name", "name1", "he", "code1", "yifeng")
-	hmget(c, "hash_name", "name1", "code1")
+	//hmGet(c, "hash_name", "name1", "code1")
 }
 
 func TestKGet(t *testing.T) {
-	val, err := KGet("test_key")
+	key := "test_key"
+	val, err := KGet(key)
 	if err != nil {
-		util.LogErr(err, zap.String("reason", "redis get"))
 		t.Fatalf("redis get error, err=%v", err)
 	}
-	util.DevInfo("[%s]\n", val)
+	//util.DevInfo("%s:[%s]\n", key, val)
+	assert.Equal(t, "3333", string(val.([]uint8)), "get value is diff")
 }
 
 func TestKSet(t *testing.T) {
-	vv := "3333"
-	err := KSet("test_key", vv)
+	key := "test_key"
+	val := "3333"
+	err := KSet(key, val)
 	if err != nil {
-		util.LogErr(err, zap.String("reason", "redis get"))
 		t.Fatalf("redis set error, err=%v", err)
 	}
 
-	val, err := KGet("test_key")
+	val2, err := KGet(key)
 	if err != nil {
-		util.LogErr(err, zap.String("reason", "redis get"))
 		t.Fatalf("redis get error, err=%v", err)
 	}
 
-	val2 := string(val.([]uint8))
-	if val2 != vv {
-		t.Fatalf("redis set value err, get[%v] != set[%v]", val2, vv)
+	val2Str := string(val2.([]uint8))
+	assert.Equal(t, val, val2Str, "redis set value err, get[%v] != set[%v]", val2, val)
+}
+
+func TestKDel(t *testing.T) {
+	key := "test_del_key"
+	val := "3333"
+	err := KSet(key, val)
+	if err != nil {
+		t.Fatalf("redis set error, err=%v", err)
 	}
+
+	val2, err := KGet(key)
+	if err != nil {
+		t.Fatalf("redis get error, err=%v", err)
+	}
+	//log.Printf("%s\n", val2)
+	val2Str := string(val2.([]uint8))
+	assert.Equal(t, val, val2Str, "redis set value err, get[%v] != set[%v]", val2, val)
+
+	err = KDel(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	val3, err := KGet(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	//log.Printf("%s\n", val3)
+	assert.Equal(t, nil, val3)
 }
 
 func TestHMGet(t *testing.T) {
 	reply, err := HMGet("test_hash", "name1", "code1")
-	util.LogErrAndExit(err)
-
+	if err != nil {
+		t.Fatal(err)
+	}
+	vals := []string{"he2", "yifeng2"}
+	//vals array
 	for i, v := range reply {
-		util.DevInfo("%d:%d", i, v)
+		//util.DevInfo("%v:%s", i, v)
+		assert.Equal(t, vals[i], string(v.([]uint8)), "hmget value is diff")
+	}
+}
+
+func TestHGetAll(t *testing.T) {
+	reply, err := HGetAll("test_all_hash")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	vals := []string{"key1", "val1", "key2", "val2"}
+	//vals array
+	for i, v := range reply {
+		//util.DevInfo("%v:%s", i, v)
+		assert.Equal(t, vals[i], string(v.([]uint8)), "hmget value is diff")
 	}
 }
 
 func TestHMSet(t *testing.T) {
-	keys := make([]interface{}, 0)
-	keys = append(keys, "name2")
-	keys = append(keys, "code2")
-
 	kvs := make([]interface{}, 0)
-	kvs = append(kvs, "name2")
+	kvs = append(kvs, "name1")
 	kvs = append(kvs, "he2")
-	kvs = append(kvs, "code2")
+	kvs = append(kvs, "code1")
 	kvs = append(kvs, "yifeng2")
 	err := HMSet("test_hash", kvs...)
-	util.LogErrAndExit(err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	keys := make([]interface{}, 0)
+	keys = append(keys, "name1")
+	keys = append(keys, "code1")
 
 	reply, err := HMGet("test_hash", keys...)
-	util.LogErrAndExit(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for i, v := range reply {
-		util.DevInfo("%d:%s\n", i, v)
-		util.DevInfo("%s\n", kvs[2*i+1])
+		//util.DevInfo("%d:%s\n", i, v)
+		//util.DevInfo("%s\n", kvs[2*i + 1])
 		v2 := string(v.([]byte))
-		if v2 != kvs[2*i+1] {
-			t.Fatal("value is diff")
-		}
+		assert.Equal(t, kvs[2*i+1], v2, "hmset error value is diff")
 	}
 }
 
 func TestIncr(t *testing.T) {
-	KSet("newbee", 0)
-	Incr("newbee")
-	//reply, err := Incr("newbee")
-	//t.Log("")
+	key := "newbee"
+	err := KSet(key, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reply, err := Incr(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	val, err := KGet(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	intval, err := strconv.Atoi(string(val.([]uint8)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, int64(intval), reply)
+}
+
+func TestTemp(t *testing.T) {
+	err := HMSet("test_all_hash", "key1", "val1", "key2", "val2")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
