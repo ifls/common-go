@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 	"testing"
 	//pb "server_go/struct/proto"
 )

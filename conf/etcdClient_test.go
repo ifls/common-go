@@ -2,7 +2,7 @@ package conf
 
 import (
 	"github.com/coreos/etcd/clientv3"
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 	"gopkg.in/go-playground/assert.v1"
 	"testing"
 	"time"

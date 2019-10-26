@@ -2,7 +2,7 @@ package redis
 
 import (
 	"github.com/gomodule/redigo/redis"
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 )
 
 var redisClient redis.Conn

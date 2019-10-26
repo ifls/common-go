@@ -2,8 +2,8 @@ package net
 
 import (
 	"github.com/gogo/protobuf/proto"
+	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
-	"gocore/util"
 	"log"
 )
 

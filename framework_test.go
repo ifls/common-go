@@ -3,7 +3,7 @@ package gocore
 import (
 	"flag"
 	"fmt"
-	"gocore/net"
+	"github.com/ifls/gocore/net"
 	"os"
 	"testing"
 	"time"

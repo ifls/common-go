@@ -3,8 +3,8 @@ package redis
 import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
+	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
-	"gocore/util"
 	"log"
 	"testing"
 )

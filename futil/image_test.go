@@ -1,7 +1,7 @@
 package futil
 
 import (
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 	"image/jpeg"
 	"os"
 	"testing"

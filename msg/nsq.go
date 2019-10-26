@@ -1,9 +1,9 @@
 package msg
 
 import (
+	"github.com/ifls/gocore/util"
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"
-	"gocore/util"
 	"time"
 )
 

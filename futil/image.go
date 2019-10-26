@@ -2,7 +2,7 @@ package futil
 
 import (
 	"bytes"
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 	"image"
 	"image/jpeg"
 )

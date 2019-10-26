@@ -2,8 +2,8 @@ package net
 
 import (
 	"fmt"
+	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
-	"gocore/util"
 	"net"
 	"time"
 )

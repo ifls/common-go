@@ -3,8 +3,8 @@ package orm
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
-	"gocore/util"
 	"testing"
 	"time"
 )

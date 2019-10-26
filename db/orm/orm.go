@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-xorm/xorm"
+	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
-	"gocore/util"
 )
 
 const (

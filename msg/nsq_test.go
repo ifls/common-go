@@ -3,9 +3,9 @@ package msg
 import (
 	"errors"
 	"fmt"
+	"github.com/ifls/gocore/util"
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"
-	"gocore/util"
 	"io/ioutil"
 	"log"
 	"os"

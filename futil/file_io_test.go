@@ -2,7 +2,7 @@ package futil
 
 import (
 	"fmt"
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 	"gopkg.in/go-playground/assert.v1"
 	"testing"
 )

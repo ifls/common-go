@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 	"time"
 )
 

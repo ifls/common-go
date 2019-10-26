@@ -2,8 +2,8 @@ package mongo
 
 import (
 	"context"
+	"github.com/ifls/gocore/util"
 	"go.mongodb.org/mongo-driver/bson"
-	"gocore/util"
 	"testing"
 	"time"
 )

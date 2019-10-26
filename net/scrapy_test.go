@@ -3,9 +3,9 @@ package net
 import (
 	"fmt"
 	"github.com/gocolly/colly"
+	"github.com/ifls/gocore/futil"
+	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
-	"gocore/futil"
-	"gocore/util"
 	"io"
 	"os"
 	"strconv"

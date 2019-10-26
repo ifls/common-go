@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/coreos/etcd/clientv3"
-	"gocore/util"
+	"github.com/ifls/gocore/util"
 	"time"
 )
 
