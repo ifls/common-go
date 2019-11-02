@@ -1,4 +1,4 @@
-package futil
+package file
 
 import (
 	"fmt"
@@ -26,7 +26,12 @@ func TestDownload(t *testing.T) {
 }
 
 func TestIsDir(t *testing.T) {
-	assert.Equal(t, IsDir("/Users/ifls"), false)
+	assert.Equal(t, true, IsDir("/Users/ifls"))
+	assert.Equal(t, true, IsDir("."))
+	assert.Equal(t, true, IsDir(".."))
+	//assert.Equal(t, false, IsDir("./file_"))
+	assert.Equal(t, false, IsDir("./file_io.go"))
+	//assert.Equal(t, false, IsDir("./file_io2.go"))
 }
 
 func TestWriteFile(t *testing.T) {
@@ -40,7 +45,11 @@ func TestWriteFile(t *testing.T) {
 }
 
 func TestFileIOExist(t *testing.T) {
-	assert.Equal(t, Exist("./file_io.go"), true)
+	assert.Equal(t, true, Exist("."))
+	assert.Equal(t, false, Exist("./cc"))
+
+	assert.Equal(t, true, Exist("./file_io.go"))
+	assert.Equal(t, false, Exist("./file_io2.go"))
 }
 
 func TestReadlines(t *testing.T) {

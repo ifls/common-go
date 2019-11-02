@@ -1,4 +1,4 @@
-package futil
+package file
 
 import (
 	"bufio"
@@ -8,25 +8,62 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 )
 
-// 文件是否已存在
+// 文件或者目录是否已存在
 func Exist(filename string) bool {
-	_, err := os.Stat(filename)
+	fileInfo, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		return false
 	}
+	log.Printf("%#v \n", fileInfo)
 	return true
 }
 
+//是否是目录
+func IsDir(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		util.LogErr(err)
+		return false
+	}
+	return fileInfo.IsDir()
+}
+
+func IsFile(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		util.LogErr(err)
+		return false
+	}
+	return !fileInfo.IsDir()
+}
+
+func CreateDir(path string) error {
+	return nil
+}
+
+func CreateFile(path string) error {
+	return nil
+}
+
+func DeleteFile(path string) error {
+	return nil
+}
+
+func DeleteDir(path string, recursion bool) error {
+	return nil
+}
+
+//////////////////////read api ///////////////////////////
 //读取所有行
 func Readlines(filepath string) ([]string, error) {
 	content, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		fmt.Println(err)
-		return nil, err
+		return nil, fmt.Errorf("read file %w", err)
 	}
 
 	allline := strings.Split(string(content), "\n")
@@ -58,29 +95,7 @@ func Readlines_buf(filepath string) ([]string, error) {
 	return allline, nil
 }
 
-func createDir(path string) {
-
-}
-
-//是否是目录
-func IsDir(path string) bool {
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		util.LogErr(err)
-		return false
-	}
-	return fileInfo.IsDir()
-}
-
-func IsFile(path string) bool {
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		util.LogErr(err)
-		return false
-	}
-	return !fileInfo.IsDir()
-}
-
+///////// write //////////////////////////
 func Write(data []byte, writer io.Writer) error {
 	n, err := writer.Write(data)
 	if err != nil {
@@ -133,8 +148,8 @@ func ReadFile(path string) ([]byte, error) {
 	}
 
 	if len(data) <= 0 {
-		util.LogError("read futil eof", zap.Int("read byte []", len(data)), zap.String("filepath", path))
-		return nil, errors.New("read futil eof")
+		util.LogError("read file eof", zap.Int("read byte []", len(data)), zap.String("filepath", path))
+		return nil, errors.New("read file eof")
 	}
 
 	return data, nil

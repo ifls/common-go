@@ -58,6 +58,7 @@ require (
 	go.mongodb.org/mongo-driver v1.1.1
 	go.uber.org/multierr v1.2.0 // indirect
 	go.uber.org/zap v1.10.0
+	golang.org/x/sys v0.0.0-20190624142023-c5567b49c5d0
 	google.golang.org/api v0.10.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0

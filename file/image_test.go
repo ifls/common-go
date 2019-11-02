@@ -1,4 +1,4 @@
-package futil
+package file
 
 import (
 	"github.com/ifls/gocore/util"

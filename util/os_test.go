@@ -24,3 +24,11 @@ func TestENV(t *testing.T) {
 		log.Println(env)
 	}
 }
+
+func TestPrintOS(t *testing.T) {
+	PrintOS()
+}
+
+func TestPrintOsInfo(t *testing.T) {
+	PrintOsInfo()
+}

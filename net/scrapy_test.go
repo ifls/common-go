@@ -3,7 +3,7 @@ package net
 import (
 	"fmt"
 	"github.com/gocolly/colly"
-	"github.com/ifls/gocore/futil"
+	"github.com/ifls/gocore/file"
 	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
 	"io"
@@ -249,9 +249,9 @@ func WriteToGcpOss(response *colly.Response, imgUrl string) {
 	filename := string(name)
 
 	filename = filename + "." + subfix
-	object := futil.GetDir(subfix, name) + filename
+	object := file.GetDir(subfix, name) + filename
 
-	err := futil.WriteGcpOss(data, futil.TEST_BUCKET, object, func(ossUrl string) {
+	err := file.WriteGcpOss(data, file.TEST_BUCKET, object, func(ossUrl string) {
 		//fileStruct := gostruct.FileCore{
 		//	Name:       filename,
 		//	Suffix:     subfix,

@@ -1,4 +1,4 @@
-package futil
+package file
 
 import (
 	"context"
@@ -418,11 +418,11 @@ func downloadUsingRequesterPays(client *storage.Client, object, bucketName, loca
 	return nil
 }
 
-//func generateV4GetObjectSignedURL(w io.Writer, client *futil.Client, bucketName, objectName, serviceAccount string) (string, error) {
+//func generateV4GetObjectSignedURL(w io.Writer, client *file.Client, bucketName, objectName, serviceAccount string) (string, error) {
 //	// [START storage_generate_signed_url_v4]
 //	jsonKey, err := ioutil.ReadFile(serviceAccount)
 //	if err != nil {
-//		return "", fmt.Errorf("cannot read the JSON key futil, err: %v", err)
+//		return "", fmt.Errorf("cannot read the JSON key file, err: %v", err)
 //	}
 //
 //	conf, err := google.JWTConfigFromJSON(jsonKey)
@@ -430,15 +430,15 @@ func downloadUsingRequesterPays(client *storage.Client, object, bucketName, loca
 //		return "", fmt.Errorf("google.JWTConfigFromJSON: %v", err)
 //	}
 //
-//	opts := &futil.SignedURLOptions{
-//		Scheme:         futil.SigningSchemeV4,
+//	opts := &file.SignedURLOptions{
+//		Scheme:         file.SigningSchemeV4,
 //		Method:         "GET",
 //		GoogleAccessID: conf.Email,
 //		PrivateKey:     conf.PrivateKey,
 //		Expires:        time.Now().Add(15 * time.Minute),
 //	}
 //
-//	u, err := futil.SignedURL(bucketName, objectName, opts)
+//	u, err := file.SignedURL(bucketName, objectName, opts)
 //	if err != nil {
 //		return "", fmt.Errorf("Unable to generate a signed URL: %v", err)
 //	}
@@ -451,19 +451,19 @@ func downloadUsingRequesterPays(client *storage.Client, object, bucketName, loca
 //	return u, nil
 //}
 //
-//func generateV4PutObjectSignedURL(w io.Writer, client *futil.Client, bucketName, objectName, serviceAccount string) (string, error) {
+//func generateV4PutObjectSignedURL(w io.Writer, client *file.Client, bucketName, objectName, serviceAccount string) (string, error) {
 //	// [START storage_generate_upload_signed_url_v4]
 //	jsonKey, err := ioutil.ReadFile(serviceAccount)
 //	if err != nil {
-//		return "", fmt.Errorf("cannot read the JSON key futil, err: %v", err)
+//		return "", fmt.Errorf("cannot read the JSON key file, err: %v", err)
 //	}
 //	conf, err := google.JWTConfigFromJSON(jsonKey)
 //	if err != nil {
 //		return "", fmt.Errorf("google.JWTConfigFromJSON: %v", err)
 //	}
 //
-//	opts := &futil.SignedURLOptions{
-//		Scheme: futil.SigningSchemeV4,
+//	opts := &file.SignedURLOptions{
+//		Scheme: file.SigningSchemeV4,
 //		Method: "PUT",
 //		Headers: []string{
 //			"Content-Type:application/octet-stream",
@@ -473,7 +473,7 @@ func downloadUsingRequesterPays(client *storage.Client, object, bucketName, loca
 //		Expires:        time.Now().Add(15 * time.Minute),
 //	}
 //
-//	u, err := futil.SignedURL(bucketName, objectName, opts)
+//	u, err := file.SignedURL(bucketName, objectName, opts)
 //	if err != nil {
 //		return "", fmt.Errorf("Unable to generate a signed URL: %v", err)
 //	}
@@ -481,7 +481,7 @@ func downloadUsingRequesterPays(client *storage.Client, object, bucketName, loca
 //	fmt.Fprintln(w, "Generated PUT signed URL:")
 //	fmt.Fprintf(w, "%q\n", u)
 //	fmt.Fprintln(w, "You can use this URL with any user agent, for example:")
-//	fmt.Fprintf(w, "curl -X PUT -H 'Content-Type: application/octet-stream' --upload-futil my-futil %q\n", u)
+//	fmt.Fprintf(w, "curl -X PUT -H 'Content-Type: application/octet-stream' --upload-file my-file %q\n", u)
 //	// [END storage_generate_upload_signed_url_v4]
 //	return u, nil
 //}

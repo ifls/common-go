@@ -1,168 +1,214 @@
 package orm
 
 import (
-	"errors"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
-	"github.com/ifls/gocore/util"
-	"go.uber.org/zap"
+	"log"
 )
 
-const (
-	DBTYPE_USER   = "user"
-	DBTYPE_CONFIG = "config"
-	DBTYPE_FILE   = "file"
-	DBTYPE_HOT    = "hot"
-	DBTYPE_LOG    = "log"
-	DBTYPE_STAT   = "stat"
-)
-
-var dbs map[string]*xorm.Engine
+type SqlCli struct {
+	*xorm.Engine
+	driver string
+	url    string
+}
 
 var currentDb *xorm.Engine
 
-func init() {
-	dbs = make(map[string]*xorm.Engine)
-
-	db, err := connectDb("")
-	//db, err := connectDb(db.MysqlUrl("root", "02#F20ebac", "tcp", host, 3306, "test_db"))
-	util.LogErrAndExit(err)
-	dbs["default"] = db
-	currentDb = db
+func MakeMysqlUrl(user, password, host string, port uint16, database string) string {
+	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?charset=utf8", user, password, "tcp", host, port, database)
 }
 
-func connectDb(url string) (*xorm.Engine, error) {
-	db, err := xorm.NewEngine("mysql", url)
+//Open 打开数据库连接
+// @driver string 数据库驱动类型
+// @url string 类型对应的连接url
+func Open(driver string, url string) (SqlCli, error) {
+	db, err := xorm.NewEngine(driver, url)
+	log.Println(url)
 	if err != nil {
-		util.LogErr(err, zap.String("reason", "new engine connect"))
-		return nil, err
+		log.Println(driver, url)
+		return SqlCli{}, fmt.Errorf("open db fail, %s, %s %w", driver, url, err)
 	}
-	return db, err
+
+	return SqlCli{
+		Engine: db,
+		driver: driver,
+		url:    url,
+	}, nil
 }
 
-//根据表结构, 创建对应的表
-func CreateTable(tableStruct interface{}) error {
-	return createTable(currentDb, tableStruct)
+// Close 关闭连接
+func (cli SqlCli) Close() {
+
 }
 
-//根据表结构, 创建对应的表
-func createTable(db *xorm.Engine, tableStruct interface{}) error {
-	if err := db.CreateTables(tableStruct); err != nil {
-		util.LogErr(err, zap.String("reason", "create table"))
-		return err
-	}
-	return nil
+// 应该是运维的工作
+func (cli SqlCli) CreateDb() {
+
 }
 
-func AlterTable(tablename interface{}, tableStruct interface{}) error {
-	return nil
-}
-
-func alterTable(db interface{}, tablename interface{}, tableStruct interface{}) error {
-	return nil
-}
-
-func DeleteTable(tableStruct interface{}) error {
-	return deleteTable(currentDb, tableStruct)
-}
-
-func deleteTable(db *xorm.Engine, tableStruct interface{}) error {
-	err := db.DropTables(tableStruct)
+// -------------------------common sql exec ---------------------------
+//执行sql 查询语句
+func (cli SqlCli) Query(sql string) ([]map[string]interface{}, error) {
+	rows, err := cli.Engine.QueryInterface(sql)
 	if err != nil {
-		util.LogErr(err, zap.String(util.LOGTAG_REASON, "delete table error"))
-		return err
+		return nil, fmt.Errorf("query fail %s %w", sql, err)
 	}
-	return nil
+
+	return rows, nil
 }
 
-func GetTableInfo(db interface{}, table interface{}) (interface{}, error) {
-	return nil, nil
-}
-
-func Find(beanSlice interface{}, query interface{}, args ...interface{}) error {
-	return find(currentDb, beanSlice, query, args...)
-}
-
-func find(db *xorm.Engine, beanSlice interface{}, query interface{}, args ...interface{}) error {
-	err := db.Where(query, args...).Find(beanSlice)
+//执行sql update语句
+func (cli SqlCli) Exec(sql string) error {
+	result, err := cli.Engine.Exec(sql)
 	if err != nil {
-		util.LogErr(err)
-		return err
+		return fmt.Errorf("exec fail %s %w", sql, err)
 	}
-
-	return nil
-}
-
-func Get(bean interface{}, query interface{}, args ...interface{}) (bool, error) {
-	return get(currentDb, bean, query, args...)
-}
-
-func get(db *xorm.Engine, bean interface{}, query interface{}, args ...interface{}) (bool, error) {
-	has, err := db.Where(query, args...).Get(bean)
+	affected, err := result.RowsAffected()
 	if err != nil {
-		util.LogErr(err)
-		return false, err
+		return fmt.Errorf("exec RowsAffected fail %w", err)
 	}
 
-	if has {
-		return true, nil
-	}
-
-	return false, nil
-}
-
-func UpdateRecord(db interface{}, table interface{}, where interface{}) error {
-	return nil
-}
-
-func InsertRecord(beans ...interface{}) error {
-	return insertRecord(currentDb, beans...)
-}
-
-func insertRecord(db *xorm.Engine, beans ...interface{}) error {
-	affected, err := db.Insert(beans...)
+	last, err := result.LastInsertId()
 	if err != nil {
-		util.LogErr(err)
-		return err
+		return fmt.Errorf("exec LastInsertId fail %w", err)
 	}
 
-	if int(affected) != len(beans) {
-		errStr := fmt.Sprintf("insert %d row, but %d row success", len(beans), affected)
-		util.LogError(errStr)
-		return errors.New(errStr)
-	}
+	log.Printf("LastInsertId =%d, RowsAffected = %d\n", last, affected)
 	return nil
 }
 
-func Exec(sql string) ([]map[string][]byte, error) {
-	return exec(currentDb, sql)
-}
+//------------------------表内 api ---------------------
 
-func exec(db *xorm.Engine, sql string) ([]map[string][]byte, error) {
-	results, err := db.Query(sql)
+func (cli SqlCli) Insert(beans ...interface{}) error {
+	affacted, err := cli.Engine.Insert(beans...)
 	if err != nil {
-		util.LogErr(err)
-		return nil, err
+		return fmt.Errorf("insert fail %w", err)
 	}
-	return results, nil
-}
 
-func DeleteRecord(db interface{}, table interface{}, where interface{}) error {
+	if affacted != int64(len(beans)) {
+		return fmt.Errorf("insert want insert %d, but inserted %d", len(beans), affacted)
+	}
+
 	return nil
 }
 
-func CreateDB(dbname string) {
+//获取一行数据， 放到bean里
+func (cli SqlCli) Get(bean interface{}) error {
+	//指定的值， 必须匹配
+	has, err := cli.Engine.Get(bean)
+	if err != nil {
+		return fmt.Errorf("get err: %w", err)
+	}
 
+	log.Printf("has = %v\n", has)
+	return nil
 }
 
-func DeleteDB(db interface{}) {
+//只判断指定行存在，不返回数据
+func (cli SqlCli) Exist(tableScheme interface{}) error {
+	//指定的值， 必须匹配
+	has, err := cli.Engine.Exist(tableScheme)
+	if err != nil {
+		return fmt.Errorf("exist err: %w", err)
+	}
 
+	log.Printf("has = %v\n", has)
+	return nil
 }
 
-func getInfo() {
+//Find beans 是作为判断类型 以及作为返回值的
+func (cli SqlCli) Find(beans interface{}) error {
+	//指定的值， 必须匹配
+	err := cli.Engine.Find(beans)
+	if err != nil {
+		return fmt.Errorf("find err: %w", err)
+	}
 
+	log.Printf("beans = %#v\n", beans)
+	return nil
 }
 
-func UseDB(dbType string) {
+//一行一行迭代，
+func (cli SqlCli) Iterate(bean interface{}, callback func(idx int, bean interface{}) error) error {
+	err := cli.Engine.Iterate(bean, callback)
+	if err != nil {
+		return fmt.Errorf("iterate err: %w", err)
+	}
 
+	return nil
 }
+
+func (cli SqlCli) Update(bean interface{}, id int64) error {
+	affacted, err := cli.Engine.ID(id).Update(bean)
+	if err != nil {
+		return fmt.Errorf("update err: %w", err)
+	}
+
+	log.Printf("affacted = %#v\n", affacted)
+	return nil
+}
+
+func (cli SqlCli) Delete(bean interface{}, id int64) error {
+	affacted, err := cli.Engine.ID(id).Delete(bean)
+	if err != nil {
+		return fmt.Errorf("delete err: %w", err)
+	}
+
+	log.Printf("affacted = %#v\n", affacted)
+	return nil
+}
+
+//统计行数
+func (cli SqlCli) Count(bean interface{}) (int64, error) {
+	return cli.Engine.Count(bean)
+}
+
+// 指定字段求和
+func (cli SqlCli) Sum(bean interface{}, field string) (float64, error) {
+	return cli.Engine.Sum(bean, field)
+}
+
+func (cli SqlCli) BeginTxn() *xorm.Session {
+	return cli.Engine.NewSession()
+}
+
+func (cli SqlCli) EndTxn(session *xorm.Session) error {
+	defer session.Close()
+	return session.Commit()
+}
+
+func (cli SqlCli) Txn(actions func(session *xorm.Session) (interface{}, error)) error {
+	result, err := cli.Engine.Transaction(actions)
+	if err != nil {
+		return fmt.Errorf("txn err: %w", err)
+	}
+
+	log.Printf("txn result = %#v\n", result)
+	return nil
+}
+
+//----------------表级 api----------------------------
+//根据表结构, 创建对应的表, 只能加字段，不能改表结构，不插入数据
+func (cli SqlCli) CreateTable(tableScheme interface{}) error {
+	return cli.Engine.Sync2(tableScheme)
+}
+
+//
+//func AlterTable(tablename interface{}, tableStruct interface{}) error {
+//	return nil
+//}
+
+func (cli SqlCli) DeleteTable(table interface{}) error {
+	err := cli.Engine.DropTables(table)
+	if err != nil {
+		return fmt.Errorf("delete table :%w", err)
+	}
+
+	return nil
+}
+
+//读取表结构
+//func (cli SqlCli) GetTableInfo(table interface{}) (interface{}, error) {
+//
+//}
