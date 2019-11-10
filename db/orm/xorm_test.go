@@ -38,6 +38,7 @@ func init() {
 		log.Fatal(err)
 	}
 	testCli = cli
+	log.Println(new(Book))
 }
 
 func TestConnStatus(t *testing.T) {

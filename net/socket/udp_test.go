@@ -17,7 +17,12 @@ func TestUdpServer(t *testing.T) {
 		t.Error(err)
 	}
 
-	defer udpConn.Close()
+	defer func() {
+		err := udpConn.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	log.Printf("udp listening on %v\n", udpAddr.String())
 

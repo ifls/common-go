@@ -43,18 +43,22 @@ func IsFile(path string) bool {
 }
 
 func CreateDir(path string) error {
+	log.Println(path)
 	return nil
 }
 
 func CreateFile(path string) error {
+	log.Println(path)
 	return nil
 }
 
 func DeleteFile(path string) error {
+	log.Println(path)
 	return nil
 }
 
 func DeleteDir(path string, recursion bool) error {
+	log.Println(path, recursion)
 	return nil
 }
 
@@ -70,14 +74,16 @@ func Readlines(filepath string) ([]string, error) {
 	return allline, nil
 }
 
-func Readlines_buf(filepath string) ([]string, error) {
+func ReadlinesBuf(filepath string) ([]string, error) {
 	// 使用bufio
 	fd, err := os.Open(filepath)
 	if err != nil {
 		util.LogErr(err)
 		return nil, err
 	}
-	defer fd.Close()
+	defer func() {
+		_ = fd.Close()
+	}()
 
 	allline := make([]string, 0)
 	buff := bufio.NewReader(fd)
@@ -205,10 +211,6 @@ func downloadGcpOss(bucket string, object string, path string) error {
 	return nil
 }
 
-func downloadGcpOssName(bucket, object string) {
-
-}
-
 func uploadGcpOss(path, bucket, object string) error {
 	data, err := ReadFile(path)
 	if err != nil {
@@ -238,7 +240,7 @@ func uploadGcpOssName(path, bucket string) error {
 
 	f := util.Sha256Hash(data)
 	dd := util.Base64Encoding(f)
-	filename := string(dd)
+	filename := dd
 
 	filename = filename + "." + subfix
 	object := GetDir(subfix, filename) + filename
@@ -252,5 +254,6 @@ func uploadGcpOssName(path, bucket string) error {
 }
 
 func isGcpOssUrl(url string) bool {
+	log.Println(url)
 	return true
 }

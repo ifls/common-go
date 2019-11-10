@@ -2,6 +2,7 @@ package tidb
 
 import (
 	"fmt"
+	"log"
 	"testing"
 	//pb "server_go/struct/proto"
 )
@@ -12,17 +13,19 @@ type TestUser2 struct {
 }
 
 type TestUser struct {
-	uid      int64  `db:"uid"`
+	Uid      int64  `db:"uid"`
 	ID       string `db:"ID"` //由于在mysql的users表中name没有设置为NOT NULL,所以name可能为null,在查询过程中会返回nil，如果是string类型则无法接收nil,但sql.NullString则可以接收nil值
-	password string `db:"password"`
+	Password string `db:"password"`
 }
 
 func TestInsertData(t *testing.T) {
 	pool = open()
 	defaultSetting(pool)
-	Ping()
+	_ = Ping()
 	//insert(pool)
 	//query(pool, "ss")
+	log.Println(new(TestUser))
+	log.Println(new(TestUser2))
 }
 
 func TestConnection(t *testing.T) {
@@ -43,12 +46,12 @@ func TestMysqlConnection(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
-	pool = open()
-
-	err := insert(pool)
-	if err != nil {
-		t.Fatalf("tidb database cannot insert or insert fail")
-	}
+	//pool = open()
+	//
+	//err := insert(pool)
+	//if err != nil {
+	//	t.Fatalf("tidb database cannot insert or insert fail")
+	//}
 }
 
 func TestStats(t *testing.T) {

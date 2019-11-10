@@ -12,7 +12,7 @@ type data struct {
 	dst []int
 }
 
-var test_case_189 = []data{
+var testCase189 = []data{
 	{
 		arr: []int{1, 2, 3, 4, 5, 6, 7},
 		k:   3,
@@ -31,7 +31,7 @@ var test_case_189 = []data{
 }
 
 func TestRun_189(t *testing.T) {
-	for _, test := range test_case_189 {
+	for _, test := range testCase189 {
 		rotate(test.arr, test.k)
 		log.Printf("%v \n", test.arr)
 		assert.Equal(t, test.dst, test.arr)

@@ -43,3 +43,14 @@ func TestEncode(t *testing.T) {
 	//fmt.Printf("1 %v\n", dataText)
 	//fmt.Printf("2, %v\n", user.(*pb.User))
 }
+
+func TestToBytes(t *testing.T) {
+	ToBytes(nil)
+	UInt32ToBytes(2)
+	BytesToUInt32([]byte("2"))
+	BytesToUInt64([]byte("2"))
+	BytesToInt64([]byte("2"))
+	BytesToFloat32([]byte("2"))
+	BytesToFloat64([]byte("2"))
+	BytesToInt32([]byte("2"))
+}

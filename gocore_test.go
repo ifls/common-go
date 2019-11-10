@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ifls/gocore/net/socket"
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -16,7 +17,7 @@ func test() {
 	tp.SetLoggerLevel("ERROR")
 
 	cli := tp.NewPeer(tp.PeerConfig{})
-	defer cli.Close()
+	defer log.Println(cli.Close())
 
 	cli.RoutePush(new(Push))
 
@@ -39,7 +40,7 @@ func test() {
 	time.Sleep(time.Second * 10)
 }
 
-func main() {
+func Test2(t *testing.T) {
 	fmt.Println(os.Args)
 
 	cmd := flag.String("type", "main", "")
@@ -53,7 +54,7 @@ func main() {
 		test()
 	} else if *cmd == "server" {
 		fmt.Println("server")
-		socket.SocketMain()
+		_ = socket.TcpMain()
 	}
 }
 

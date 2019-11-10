@@ -3,13 +3,15 @@ package socket
 import (
 	"fmt"
 	tp "github.com/henrylee2cn/teleport"
+	"log"
 	"time"
 )
 
 //"github.com/google/gopacket"
 //" net配合goroutine+channel 就可以了"""
-func SocketMain() {
+func TcpMain() error {
 	// graceful
+
 	go tp.GraceSignal()
 
 	// server peer
@@ -37,7 +39,12 @@ func SocketMain() {
 	}()
 
 	// listen and serve
-	srv.ListenAndServe()
+	err := srv.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Math handler
@@ -75,7 +82,12 @@ func client() {
 	tp.SetLoggerLevel("ERROR")
 
 	cli := tp.NewPeer(tp.PeerConfig{})
-	defer cli.Close()
+	defer func() {
+		err := cli.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	cli.RoutePush(new(Push))
 

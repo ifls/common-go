@@ -5,13 +5,14 @@ import (
 	net2 "github.com/ifls/gocore/net"
 	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
+	"log"
 	"net"
 	"time"
 )
 
 const (
-	PROTOCOL_TCP  = "tcp"
-	PACKET_LENGTH = 4
+	ProtocolTcp  = "tcp"
+	PacketLength = 4
 )
 
 type TcpCallback struct {
@@ -33,10 +34,15 @@ type TcpParams struct {
 // 连接处理器不断接收客户端信息，知道客户端申请断开连接，服务端把连接关闭。
 func ServerMain(addr string, callback TcpCallback, params TcpParams) {
 	//启动监听器
-	listener, err := net.Listen(PROTOCOL_TCP, addr)
-	util.LogErr(err, zap.String(util.LOGTAG_REASON, fmt.Sprintf("listen on %s->%s", PROTOCOL_TCP, addr)))
-
-	defer listener.Close()
+	listener, err := net.Listen(ProtocolTcp, addr)
+	util.LogErr(err, zap.String(util.LogTagReason, fmt.Sprintf("listen on %s->%s", ProtocolTcp, addr)))
+	log.Println(params)
+	defer func() {
+		err := listener.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	//tcp服务端应不断处于等待连接状态
 	for {
@@ -44,7 +50,7 @@ func ServerMain(addr string, callback TcpCallback, params TcpParams) {
 		conn, err := listener.Accept()
 
 		if err != nil {
-			util.LogErr(err, zap.String(util.LOGTAG_REASON, "listener.Accept()"))
+			util.LogErr(err, zap.String(util.LogTagReason, "listener.Accept()"))
 		} else {
 			//每个连接, 一个子协程进行对话
 			go handleConnect(conn, callback)
@@ -53,7 +59,10 @@ func ServerMain(addr string, callback TcpCallback, params TcpParams) {
 }
 
 func handleConnect(conn net.Conn, callback TcpCallback) {
-	defer conn.Close()
+	defer func() {
+		err := conn.Close()
+		log.Println(err)
+	}()
 
 	connBuff := make([]byte, 0)
 	readBuff := make([]byte, 1024)
@@ -61,29 +70,31 @@ func handleConnect(conn net.Conn, callback TcpCallback) {
 	for {
 		n, err := conn.Read(readBuff)
 		if err != nil {
-			util.LogErr(err, zap.String(util.LOGTAG_REASON, "Conn.Read() err"))
+			util.LogErr(err, zap.String(util.LogTagReason, "Conn.Read() err"))
 			return
 		}
 
 		if n <= 0 {
-			util.LogErr(err, zap.String(util.LOGTAG_REASON, "Conn.Read() <=0 eof"))
+			util.LogErr(err, zap.String(util.LogTagReason, "Conn.Read() <=0 eof"))
 			return
 		}
 
 		connBuff = append(connBuff, readBuff[:n]...)
-		if len(connBuff) > PACKET_LENGTH {
+		if len(connBuff) > PacketLength {
 			connBuff = readPackets(conn, connBuff, callback)
 		}
 	}
 }
 
 func readPackets(conn net.Conn, buff []byte, callback TcpCallback) []byte {
+	log.Println(conn)
+	log.Println(callback)
 	var packet []byte
 	for {
 		buff, packet = Unpacket(buff) //对缓冲区进行分包处理
 
 		if packet != nil {
-			handle(conn, packet, callback)
+			//handle(conn, packet, callback)
 		} else {
 			break
 		}
@@ -95,7 +106,7 @@ func Unpacket(buff []byte) ([]byte, []byte) {
 	length := len(buff)
 
 	//如果包长小于header 就直接返回 因为接收的数据不完整
-	if length < PACKET_LENGTH {
+	if length < PacketLength {
 		return buff, nil
 	}
 
@@ -106,19 +117,19 @@ func Unpacket(buff []byte) ([]byte, []byte) {
 	}
 
 	//划分数组
-	return buff[packetLength:], buff[PACKET_LENGTH:packetLength]
+	return buff[packetLength:], buff[PacketLength:packetLength]
 }
 
-func handle(conn net.Conn, packet []byte, callback TcpCallback) {
-	//sample := &pb.HeaderContainer{}
-	//err := proto.Unmarshal(packet, sample)
-	//if err != nil {
-	//	util.LogErr(err, zap.String(util.LOGTAG_REASON, "proto.Unmarshal()"))
-	//	return
-	//}
-
-	//callback.Dispatch(conn, sample.GetHeader().Cmd, packet)
-}
+//func handle(conn net.Conn, packet []byte, callback TcpCallback) {
+//sample := &pb.HeaderContainer{}
+//err := proto.Unmarshal(packet, sample)
+//if err != nil {
+//	util.LogErr(err, zap.String(util.LOGTAG_REASON, "proto.Unmarshal()"))
+//	return
+//}
+//
+//callback.Dispatch(conn, sample.GetHeader().Cmd, packet)
+//}
 
 //----------------------- client -------------------//
 
@@ -128,7 +139,10 @@ func ClientMain(addr string) {
 	if err != nil {
 		fmt.Printf("err:%s\n", err)
 	}
-	defer conn.Close()
+	defer func() {
+		err := conn.Close()
+		log.Println(err)
+	}()
 	util.LogErr(err, zap.String("reason", "net.Dial"))
 
 	//创建一个承载信息的桶
@@ -148,7 +162,10 @@ func ClientMain(addr string) {
 		//}
 		//fmt.Printf("%s\n", string([]byte{0x00, 0x00, 0x00, 0x41}))
 		util.DevInfo("send to server:%v, len=%v\n", lineByte, len(lineByte))
-		conn.Write(lineByte)
+		count, err = conn.Write(lineByte)
+		if err != nil {
+			log.Println(err)
+		}
 		count += len(lineByte)
 		//for i := 0; i < len(lineByte); i++ {
 		//

@@ -12,17 +12,26 @@ func TestENV(t *testing.T) {
 		log.Println(env)
 	}
 
-	os.Setenv("qqnumber", "password")
+	err := os.Setenv("qqnumber", "password")
+	if err != nil {
+		t.Fatal(err)
+	}
+	envs = os.Environ()
+	for _, env := range envs {
+		log.Println(env)
+	}
+	err = os.Unsetenv("qqnumber")
+	if err != nil {
+		t.Fatal(err)
+	}
+	envs = os.Environ()
+	for _, env := range envs {
+		log.Println(env)
+	}
+}
 
-	envs = os.Environ()
-	for _, env := range envs {
-		log.Println(env)
-	}
-	os.Unsetenv("qqnumber")
-	envs = os.Environ()
-	for _, env := range envs {
-		log.Println(env)
-	}
+func TestGetTid(t *testing.T) {
+	GetTid("ss")
 }
 
 func TestPrintOS(t *testing.T) {

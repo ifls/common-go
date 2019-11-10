@@ -16,7 +16,10 @@ func TestPub(t *testing.T) {
 	// 项目名
 	proj := os.Getenv("GOOGLE_CLOUD_PROJECT")
 	if proj == "" {
-		fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
+		_, err := fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
+		if err != nil {
+			t.Fatal(err)
+		}
 		os.Exit(1)
 	}
 
@@ -74,7 +77,10 @@ func TestSub(t *testing.T) {
 	ctx := context.Background()
 	proj := os.Getenv("GOOGLE_CLOUD_PROJECT")
 	if proj == "" {
-		fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
+		_, err := fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
+		if err != nil {
+			t.Fatal(err)
+		}
 		os.Exit(1)
 	}
 	client, err := pubsub.NewClient(ctx, proj)
@@ -94,7 +100,6 @@ func TestSub(t *testing.T) {
 
 	// t := createTopicIfNotExists(client)
 
-	const sub = "log_get2"
 	// Create a new subscription.
 	// if err := create(client, sub, t); err != nil {
 	// 	proto.Fatal(err)
@@ -111,4 +116,31 @@ func TestSub(t *testing.T) {
 	// if err := delete(client, sub); err != nil {
 	// 	proto.Fatal(err)
 	// }
+}
+func TestGooglePubSub(t *testing.T) {
+	err := createTopic(nil, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = deleteTopic(nil, "")
+	_ = publicMessageN(nil, "", 3)
+	_ = publishWithAttributes(nil, "")
+	_ = publishWithSettings(nil, "", []byte(""))
+	_ = publishSingleGoroutine(nil, "", []byte(""))
+	_, _ = getPubPolicy(nil, "")
+	_ = addPubUsers(nil, "")
+	_, _ = testPubPermissions(nil, "")
+	_ = pullMsgs(nil, "", nil)
+	_ = pullMsgsSettings(nil, "")
+	_ = create(nil, "", nil)
+	_ = createWithEndpoint(nil, "", nil, "")
+	_ = updateEndpoint(nil, "", "")
+	_ = delete2(nil, "")
+	exists := createTopicIfNotExists(nil)
+	log.Println(exists)
+	_, _ = getSubPolicy(nil, "")
+	_ = addSubUsers(nil, "")
+	_, _ = testSubPermissions(nil, "")
+
+	_ = pullMsgsError(nil, "")
 }

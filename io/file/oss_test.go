@@ -1,26 +1,22 @@
 package file
 
 import (
+	"cloud.google.com/go/storage"
 	"context"
-	"time"
-
-	//"flag"
 	"fmt"
 	"google.golang.org/api/iterator"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	//"strings"
 	"testing"
-
-	"cloud.google.com/go/storage"
+	"time"
 )
 
 func TestOSS(t *testing.T) {
 	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
 	if projectID == "" {
-		fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
+		_, _ = fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
 		os.Exit(1)
 	}
 	//var o string
@@ -68,7 +64,7 @@ func TestOSS(t *testing.T) {
 			log.Fatalf("Cannot to make object public: %v", err)
 		}
 	case "delete":
-		if err := delete(client, bucket, object); err != nil {
+		if err := delete2(client, bucket, object); err != nil {
 			log.Fatalf("Cannot to delete object: %v", err)
 		}
 	case "list":
@@ -85,7 +81,9 @@ func write(client *storage.Client, bucket, object string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 
 	wc := client.Bucket(bucket).Object(object).NewWriter(ctx)
 	if _, err = io.Copy(wc, f); err != nil {
@@ -119,42 +117,43 @@ func list(client *storage.Client, bucket string) error {
 	return nil
 }
 
-func listByPrefix(w io.Writer, client *storage.Client, bucket, prefix, delim string) error {
-	ctx := context.Background()
-	// [START storage_list_files_with_prefix]
-	// Prefixes and delimiters can be used to emulate directory listings.
-	// Prefixes can be used filter objects starting with prefix.
-	// The delimiter argument can be used to restrict the results to only the
-	// objects in the given "directory". Without the delimiter, the entire  tree
-	// under the prefix is returned.
-	//
-	// For example, given these blobs:
-	//   /a/1.txt
-	//   /a/b/2.txt
-	//
-	// If you just specify prefix="a/", you'll get back:
-	//   /a/1.txt
-	//   /a/b/2.txt
-	//
-	// However, if you specify prefix="a/" and delim="/", you'll get back:
-	//   /a/1.txt
-	it := client.Bucket(bucket).Objects(ctx, &storage.Query{
-		Prefix:    prefix,
-		Delimiter: delim,
-	})
-	for {
-		attrs, err := it.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return err
-		}
-		fmt.Fprintln(w, attrs.Name)
-	}
-	// [END storage_list_files_with_prefix]
-	return nil
-}
+//
+//func listByPrefix(w io.Writer, client *storage.Client, bucket, prefix, delim string) error {
+//	ctx := context.Background()
+//	// [START storage_list_files_with_prefix]
+//	// Prefixes and delimiters can be used to emulate directory listings.
+//	// Prefixes can be used filter objects starting with prefix.
+//	// The delimiter argument can be used to restrict the results to only the
+//	// objects in the given "directory". Without the delimiter, the entire  tree
+//	// under the prefix is returned.
+//	//
+//	// For example, given these blobs:
+//	//   /a/1.txt
+//	//   /a/b/2.txt
+//	//
+//	// If you just specify prefix="a/", you'll get back:
+//	//   /a/1.txt
+//	//   /a/b/2.txt
+//	//
+//	// However, if you specify prefix="a/" and delim="/", you'll get back:
+//	//   /a/1.txt
+//	it := client.Bucket(bucket).Objects(ctx, &storage.Query{
+//		Prefix:    prefix,
+//		Delimiter: delim,
+//	})
+//	for {
+//		attrs, err := it.Next()
+//		if err == iterator.Done {
+//			break
+//		}
+//		if err != nil {
+//			return err
+//		}
+//		fmt.Fprintln(w, attrs.Name)
+//	}
+//	// [END storage_list_files_with_prefix]
+//	return nil
+//}
 
 func read(client *storage.Client, bucket, object string) ([]byte, error) {
 	ctx := context.Background()
@@ -163,7 +162,9 @@ func read(client *storage.Client, bucket, object string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rc.Close()
+	defer func() {
+		_ = rc.Close()
+	}()
 
 	data, err := ioutil.ReadAll(rc)
 	if err != nil {
@@ -210,61 +211,61 @@ func attrs(client *storage.Client, bucket, object string) (*storage.ObjectAttrs,
 	// [END get_metadata]
 }
 
-func setEventBasedHold(client *storage.Client, bucket, object string) error {
-	ctx := context.Background()
-	// [START storage_set_event_based_hold]
-	o := client.Bucket(bucket).Object(object)
-	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
-		EventBasedHold: true,
-	}
-	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
-		return err
-	}
-	// [END storage_set_event_based_hold]
-	return nil
-}
+//func setEventBasedHold(client *storage.Client, bucket, object string) error {
+//	ctx := context.Background()
+//	// [START storage_set_event_based_hold]
+//	o := client.Bucket(bucket).Object(object)
+//	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
+//		EventBasedHold: true,
+//	}
+//	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
+//		return err
+//	}
+//	// [END storage_set_event_based_hold]
+//	return nil
+//}
+//
+//func releaseEventBasedHold(client *storage.Client, bucket, object string) error {
+//	ctx := context.Background()
+//	// [START storage_release_event_based_hold]
+//	o := client.Bucket(bucket).Object(object)
+//	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
+//		EventBasedHold: false,
+//	}
+//	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
+//		return err
+//	}
+//	// [END storage_release_event_based_hold]
+//	return nil
+//}
+//
+//func setTemporaryHold(client *storage.Client, bucket, object string) error {
+//	ctx := context.Background()
+//	// [START storage_set_temporary_hold]
+//	o := client.Bucket(bucket).Object(object)
+//	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
+//		TemporaryHold: true,
+//	}
+//	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
+//		return err
+//	}
+//	// [END storage_set_temporary_hold]
+//	return nil
+//}
 
-func releaseEventBasedHold(client *storage.Client, bucket, object string) error {
-	ctx := context.Background()
-	// [START storage_release_event_based_hold]
-	o := client.Bucket(bucket).Object(object)
-	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
-		EventBasedHold: false,
-	}
-	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
-		return err
-	}
-	// [END storage_release_event_based_hold]
-	return nil
-}
-
-func setTemporaryHold(client *storage.Client, bucket, object string) error {
-	ctx := context.Background()
-	// [START storage_set_temporary_hold]
-	o := client.Bucket(bucket).Object(object)
-	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
-		TemporaryHold: true,
-	}
-	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
-		return err
-	}
-	// [END storage_set_temporary_hold]
-	return nil
-}
-
-func releaseTemporaryHold(client *storage.Client, bucket, object string) error {
-	ctx := context.Background()
-	// [START storage_release_temporary_hold]
-	o := client.Bucket(bucket).Object(object)
-	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
-		TemporaryHold: false,
-	}
-	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
-		return err
-	}
-	// [END storage_release_temporary_hold]
-	return nil
-}
+//func releaseTemporaryHold(client *storage.Client, bucket, object string) error {
+//	ctx := context.Background()
+//	// [START storage_release_temporary_hold]
+//	o := client.Bucket(bucket).Object(object)
+//	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
+//		TemporaryHold: false,
+//	}
+//	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
+//		return err
+//	}
+//	// [END storage_release_temporary_hold]
+//	return nil
+//}
 
 func makePublic(client *storage.Client, bucket, object string) error {
 	ctx := context.Background()
@@ -277,39 +278,39 @@ func makePublic(client *storage.Client, bucket, object string) error {
 	return nil
 }
 
-func move(client *storage.Client, bucket, object string) error {
-	ctx := context.Background()
-	// [START move_file]
-	dstName := object + "-rename"
-
-	src := client.Bucket(bucket).Object(object)
-	dst := client.Bucket(bucket).Object(dstName)
-
-	if _, err := dst.CopierFrom(src).Run(ctx); err != nil {
-		return err
-	}
-	if err := src.Delete(ctx); err != nil {
-		return err
-	}
-	// [END move_file]
-	return nil
-}
-
-func copyToBucket(client *storage.Client, dstBucket, srcBucket, srcObject string) error {
-	ctx := context.Background()
-	// [START copy_file]
-	dstObject := srcObject + "-copy"
-	src := client.Bucket(srcBucket).Object(srcObject)
-	dst := client.Bucket(dstBucket).Object(dstObject)
-
-	if _, err := dst.CopierFrom(src).Run(ctx); err != nil {
-		return err
-	}
-	// [END copy_file]
-	return nil
-}
-
-func delete(client *storage.Client, bucket, object string) error {
+//func move(client *storage.Client, bucket, object string) error {
+//	ctx := context.Background()
+//	// [START move_file]
+//	dstName := object + "-rename"
+//
+//	src := client.Bucket(bucket).Object(object)
+//	dst := client.Bucket(bucket).Object(dstName)
+//
+//	if _, err := dst.CopierFrom(src).Run(ctx); err != nil {
+//		return err
+//	}
+//	if err := src.Delete(ctx); err != nil {
+//		return err
+//	}
+//	// [END move_file]
+//	return nil
+//}
+//
+//func copyToBucket(client *storage.Client, dstBucket, srcBucket, srcObject string) error {
+//	ctx := context.Background()
+//	// [START copy_file]
+//	dstObject := srcObject + "-copy"
+//	src := client.Bucket(srcBucket).Object(srcObject)
+//	dst := client.Bucket(dstBucket).Object(dstObject)
+//
+//	if _, err := dst.CopierFrom(src).Run(ctx); err != nil {
+//		return err
+//	}
+//	// [END copy_file]
+//	return nil
+//}
+//
+func delete2(client *storage.Client, bucket, object string) error {
 	ctx := context.Background()
 	// [START delete_file]
 	o := client.Bucket(bucket).Object(object)
@@ -320,198 +321,201 @@ func delete(client *storage.Client, bucket, object string) error {
 	return nil
 }
 
-// writeEncryptedObject writes an object encrypted with user-provided AES key to a bucket.
-func writeEncryptedObject(client *storage.Client, bucket, object string, secretKey []byte) error {
-	ctx := context.Background()
-
-	// [START storage_upload_encrypted_file]
-	obj := client.Bucket(bucket).Object(object)
-	// Encrypt the object's contents.
-	wc := obj.Key(secretKey).NewWriter(ctx)
-	if _, err := wc.Write([]byte("top secret")); err != nil {
-		return err
-	}
-	if err := wc.Close(); err != nil {
-		return err
-	}
-	// [END storage_upload_encrypted_file]
-	return nil
-}
-
-// writeWithKMSKey writes an object encrypted with KMS-provided key to a bucket.
-func writeWithKMSKey(client *storage.Client, bucket, object string, keyName string) error {
-	ctx := context.Background()
-
-	// [START storage_upload_with_kms_key]
-	obj := client.Bucket(bucket).Object(object)
-	// Encrypt the object's contents
-	wc := obj.NewWriter(ctx)
-	wc.KMSKeyName = keyName
-	if _, err := wc.Write([]byte("top secret")); err != nil {
-		return err
-	}
-	if err := wc.Close(); err != nil {
-		return err
-	}
-	// [END storage_upload_with_kms_key]
-	return nil
-}
-
-func readEncryptedObject(client *storage.Client, bucket, object string, secretKey []byte) ([]byte, error) {
-	ctx := context.Background()
-
-	// [START storage_download_encrypted_file]
-	obj := client.Bucket(bucket).Object(object)
-	rc, err := obj.Key(secretKey).NewReader(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer rc.Close()
-
-	data, err := ioutil.ReadAll(rc)
-	if err != nil {
-		return nil, err
-	}
-	// [END storage_download_encrypted_file]
-	return data, nil
-}
-
-func rotateEncryptionKey(client *storage.Client, bucket, object string, key, newKey []byte) error {
-	ctx := context.Background()
-	// [START storage_rotate_encryption_key]
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		return err
-	}
-	obj := client.Bucket(bucket).Object(object)
-	// obj is encrypted with key, we are encrypting it with the newKey.
-	_, err = obj.Key(newKey).CopierFrom(obj.Key(key)).Run(ctx)
-	if err != nil {
-		return err
-	}
-	// [END storage_rotate_encryption_key]
-	return nil
-}
-
-func downloadUsingRequesterPays(client *storage.Client, object, bucketName, localpath, billingProjectID string) error {
-	ctx := context.Background()
-	// [START storage_download_file_requester_pays]
-	bucket := client.Bucket(bucketName).UserProject(billingProjectID)
-	src := bucket.Object(object)
-
-	f, err := os.OpenFile(localpath, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		return err
-	}
-	rc, err := src.NewReader(ctx)
-	if err != nil {
-		return err
-	}
-	if _, err := io.Copy(f, rc); err != nil {
-		return err
-	}
-	if err := rc.Close(); err != nil {
-		return err
-	}
-	fmt.Printf("Downloaded using %v as billing project.\n", billingProjectID)
-	// [END storage_download_file_requester_pays]
-	return nil
-}
-
-//func generateV4GetObjectSignedURL(w io.Writer, client *file.Client, bucketName, objectName, serviceAccount string) (string, error) {
-//	// [START storage_generate_signed_url_v4]
-//	jsonKey, err := ioutil.ReadFile(serviceAccount)
-//	if err != nil {
-//		return "", fmt.Errorf("cannot read the JSON key file, err: %v", err)
-//	}
 //
-//	conf, err := google.JWTConfigFromJSON(jsonKey)
-//	if err != nil {
-//		return "", fmt.Errorf("google.JWTConfigFromJSON: %v", err)
-//	}
+//// writeEncryptedObject writes an object encrypted with user-provided AES key to a bucket.
+//func writeEncryptedObject(client *storage.Client, bucket, object string, secretKey []byte) error {
+//	ctx := context.Background()
 //
-//	opts := &file.SignedURLOptions{
-//		Scheme:         file.SigningSchemeV4,
-//		Method:         "GET",
-//		GoogleAccessID: conf.Email,
-//		PrivateKey:     conf.PrivateKey,
-//		Expires:        time.Now().Add(15 * time.Minute),
+//	// [START storage_upload_encrypted_file]
+//	obj := client.Bucket(bucket).Object(object)
+//	// Encrypt the object's contents.
+//	wc := obj.Key(secretKey).NewWriter(ctx)
+//	if _, err := wc.Write([]byte("top secret")); err != nil {
+//		return err
 //	}
-//
-//	u, err := file.SignedURL(bucketName, objectName, opts)
-//	if err != nil {
-//		return "", fmt.Errorf("Unable to generate a signed URL: %v", err)
+//	if err := wc.Close(); err != nil {
+//		return err
 //	}
-//
-//	fmt.Fprintln(w, "Generated GET signed URL:")
-//	fmt.Fprintf(w, "%q\n", u)
-//	fmt.Fprintln(w, "You can use this URL with any user agent, for example:")
-//	fmt.Fprintf(w, "curl %q\n", u)
-//	// [END storage_generate_signed_url_v4]
-//	return u, nil
+//	// [END storage_upload_encrypted_file]
+//	return nil
 //}
 //
-//func generateV4PutObjectSignedURL(w io.Writer, client *file.Client, bucketName, objectName, serviceAccount string) (string, error) {
-//	// [START storage_generate_upload_signed_url_v4]
-//	jsonKey, err := ioutil.ReadFile(serviceAccount)
-//	if err != nil {
-//		return "", fmt.Errorf("cannot read the JSON key file, err: %v", err)
-//	}
-//	conf, err := google.JWTConfigFromJSON(jsonKey)
-//	if err != nil {
-//		return "", fmt.Errorf("google.JWTConfigFromJSON: %v", err)
-//	}
+//// writeWithKMSKey writes an object encrypted with KMS-provided key to a bucket.
+//func writeWithKMSKey(client *storage.Client, bucket, object string, keyName string) error {
+//	ctx := context.Background()
 //
-//	opts := &file.SignedURLOptions{
-//		Scheme: file.SigningSchemeV4,
-//		Method: "PUT",
-//		Headers: []string{
-//			"Content-Type:application/octet-stream",
-//		},
-//		GoogleAccessID: conf.Email,
-//		PrivateKey:     conf.PrivateKey,
-//		Expires:        time.Now().Add(15 * time.Minute),
+//	// [START storage_upload_with_kms_key]
+//	obj := client.Bucket(bucket).Object(object)
+//	// Encrypt the object's contents
+//	wc := obj.NewWriter(ctx)
+//	wc.KMSKeyName = keyName
+//	if _, err := wc.Write([]byte("top secret")); err != nil {
+//		return err
 //	}
-//
-//	u, err := file.SignedURL(bucketName, objectName, opts)
-//	if err != nil {
-//		return "", fmt.Errorf("Unable to generate a signed URL: %v", err)
+//	if err := wc.Close(); err != nil {
+//		return err
 //	}
-//
-//	fmt.Fprintln(w, "Generated PUT signed URL:")
-//	fmt.Fprintf(w, "%q\n", u)
-//	fmt.Fprintln(w, "You can use this URL with any user agent, for example:")
-//	fmt.Fprintf(w, "curl -X PUT -H 'Content-Type: application/octet-stream' --upload-file my-file %q\n", u)
-//	// [END storage_generate_upload_signed_url_v4]
-//	return u, nil
+//	// [END storage_upload_with_kms_key]
+//	return nil
 //}
-
-const helptext = `usage: objects -o=bucket:name [subcommand] <args...>
-subcommands:
-	- write
-	- read
-	- metadata
-	- makepublic
-	- delete
-`
-
-func usage(msg string) {
-	if msg != "" {
-		fmt.Fprintln(os.Stderr, msg)
-	}
-	fmt.Fprintln(os.Stderr, helptext)
-	os.Exit(2)
-}
-
+//
+//func readEncryptedObject(client *storage.Client, bucket, object string, secretKey []byte) ([]byte, error) {
+//	ctx := context.Background()
+//
+//	// [START storage_download_encrypted_file]
+//	obj := client.Bucket(bucket).Object(object)
+//	rc, err := obj.Key(secretKey).NewReader(ctx)
+//	if err != nil {
+//		return nil, err
+//	}
+//	defer rc.Close()
+//
+//	data, err := ioutil.ReadAll(rc)
+//	if err != nil {
+//		return nil, err
+//	}
+//	// [END storage_download_encrypted_file]
+//	return data, nil
+//}
+//
+//func rotateEncryptionKey(client *storage.Client, bucket, object string, key, newKey []byte) error {
+//	ctx := context.Background()
+//	// [START storage_rotate_encryption_key]
+//	client, err := storage.NewClient(ctx)
+//	if err != nil {
+//		return err
+//	}
+//	obj := client.Bucket(bucket).Object(object)
+//	// obj is encrypted with key, we are encrypting it with the newKey.
+//	_, err = obj.Key(newKey).CopierFrom(obj.Key(key)).Run(ctx)
+//	if err != nil {
+//		return err
+//	}
+//	// [END storage_rotate_encryption_key]
+//	return nil
+//}
+//
+//func downloadUsingRequesterPays(client *storage.Client, object, bucketName, localpath, billingProjectID string) error {
+//	ctx := context.Background()
+//	// [START storage_download_file_requester_pays]
+//	bucket := client.Bucket(bucketName).UserProject(billingProjectID)
+//	src := bucket.Object(object)
+//
+//	f, err := os.OpenFile(localpath, os.O_RDWR|os.O_CREATE, 0755)
+//	if err != nil {
+//		return err
+//	}
+//	rc, err := src.NewReader(ctx)
+//	if err != nil {
+//		return err
+//	}
+//	if _, err := io.Copy(f, rc); err != nil {
+//		return err
+//	}
+//	if err := rc.Close(); err != nil {
+//		return err
+//	}
+//	fmt.Printf("Downloaded using %v as billing project.\n", billingProjectID)
+//	// [END storage_download_file_requester_pays]
+//	return nil
+//}
+//
+////func generateV4GetObjectSignedURL(w io.Writer, client *file.Client, bucketName, objectName, serviceAccount string) (string, error) {
+////	// [START storage_generate_signed_url_v4]
+////	jsonKey, err := ioutil.ReadFile(serviceAccount)
+////	if err != nil {
+////		return "", fmt.Errorf("cannot read the JSON key file, err: %v", err)
+////	}
+////
+////	conf, err := google.JWTConfigFromJSON(jsonKey)
+////	if err != nil {
+////		return "", fmt.Errorf("google.JWTConfigFromJSON: %v", err)
+////	}
+////
+////	opts := &file.SignedURLOptions{
+////		Scheme:         file.SigningSchemeV4,
+////		Method:         "GET",
+////		GoogleAccessID: conf.Email,
+////		PrivateKey:     conf.PrivateKey,
+////		Expires:        time.Now().Add(15 * time.Minute),
+////	}
+////
+////	u, err := file.SignedURL(bucketName, objectName, opts)
+////	if err != nil {
+////		return "", fmt.Errorf("Unable to generate a signed URL: %v", err)
+////	}
+////
+////	fmt.Fprintln(w, "Generated GET signed URL:")
+////	fmt.Fprintf(w, "%q\n", u)
+////	fmt.Fprintln(w, "You can use this URL with any user agent, for example:")
+////	fmt.Fprintf(w, "curl %q\n", u)
+////	// [END storage_generate_signed_url_v4]
+////	return u, nil
+////}
+////
+////func generateV4PutObjectSignedURL(w io.Writer, client *file.Client, bucketName, objectName, serviceAccount string) (string, error) {
+////	// [START storage_generate_upload_signed_url_v4]
+////	jsonKey, err := ioutil.ReadFile(serviceAccount)
+////	if err != nil {
+////		return "", fmt.Errorf("cannot read the JSON key file, err: %v", err)
+////	}
+////	conf, err := google.JWTConfigFromJSON(jsonKey)
+////	if err != nil {
+////		return "", fmt.Errorf("google.JWTConfigFromJSON: %v", err)
+////	}
+////
+////	opts := &file.SignedURLOptions{
+////		Scheme: file.SigningSchemeV4,
+////		Method: "PUT",
+////		Headers: []string{
+////			"Content-Type:application/octet-stream",
+////		},
+////		GoogleAccessID: conf.Email,
+////		PrivateKey:     conf.PrivateKey,
+////		Expires:        time.Now().Add(15 * time.Minute),
+////	}
+////
+////	u, err := file.SignedURL(bucketName, objectName, opts)
+////	if err != nil {
+////		return "", fmt.Errorf("Unable to generate a signed URL: %v", err)
+////	}
+////
+////	fmt.Fprintln(w, "Generated PUT signed URL:")
+////	fmt.Fprintf(w, "%q\n", u)
+////	fmt.Fprintln(w, "You can use this URL with any user agent, for example:")
+////	fmt.Fprintf(w, "curl -X PUT -H 'Content-Type: application/octet-stream' --upload-file my-file %q\n", u)
+////	// [END storage_generate_upload_signed_url_v4]
+////	return u, nil
+////}
+//
+//const helptext = `usage: objects -o=bucket:name [subcommand] <args...>
+//subcommands:
+//	- write
+//	- read
+//	- metadata
+//	- makepublic
+//	- delete
+//`
+//
+//func usage(msg string) {
+//	if msg != "" {
+//		_, _ = fmt.Fprintln(os.Stderr, msg)
+//	}
+//	_, _ = fmt.Fprintln(os.Stderr, helptext)
+//	os.Exit(2)
+//}
+//
 func createFile(data []byte) {
 	//创建文件
 	//Create函数也是调用的OpenFile
-	file3, error := os.Create("./oss_download.jpg")
-	if error != nil {
-		fmt.Println(error)
+	file3, err := os.Create("./oss_download.jpg")
+	if err != nil {
+		fmt.Println(err)
 	}
 	fmt.Println(file3)
-	defer file3.Close()
+	defer func() {
+		_ = file3.Close()
+	}()
 
-	file3.Write(data)
+	_, _ = file3.Write(data)
 }

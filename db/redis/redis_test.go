@@ -27,7 +27,9 @@ func TestRedisConn(t *testing.T) {
 	}
 	//推迟调用的函数其参数会立即求值，但直到外层函数返回前该函数都不会被调用
 	//多个defer，按照后进先出
-	defer c.Close()
+	defer func() {
+		_ = c.Close()
+	}()
 
 	////c.Send("get", )
 	//val, err := kGet(c, "aa")

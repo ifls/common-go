@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-var topic string = "log_time"
+var topic = "log_time"
 
 type ConsumerHandler struct {
 	t              *testing.T
@@ -283,7 +283,7 @@ func readMessages(topicName string, t *testing.T, msgCount int) {
 }
 
 func TestNsqProductor(t *testing.T) {
-	strIP1 := nsqdtcp
+	strIP1 := nsqIp
 
 	producer1, err := initProducer(strIP1)
 	if err != nil {
@@ -337,11 +337,11 @@ func (np *nsqProducer) public(topic, message string) error {
 }
 
 func TestNsqComsumer(t *testing.T) {
-	err := initConsumer("test1", "test-channel1", nsqlookupdhttp)
+	err := initConsumer("test1", "test-channel1", nsqLookupHttp)
 	if err != nil {
 		log.Fatal("init Consumer error")
 	}
-	err = initConsumer("test2", "test-channel2", nsqlookupdhttp)
+	err = initConsumer("test2", "test-channel2", nsqLookupHttp)
 	if err != nil {
 		log.Fatal("init Consumer error")
 	}
@@ -392,7 +392,7 @@ func TestNsqPublishMessage(t *testing.T) {
 }
 
 func TestNsqCsm(t *testing.T) {
-	Consumer(topic, "t1", nsqlookupdhttp)
+	_ = Consumer(topic, "t1", nsqLookupHttp)
 	//AddMessagehandler(topic, func(msg *nsq.Message) error{
 	//	util.DevInfo("msg=%v", msg)
 	//	return nil
@@ -414,7 +414,7 @@ func TestNsq(t *testing.T) {
 		}
 
 		consumer.AddHandler(&NSQHandler{})
-		err = consumer.ConnectToNSQD(nsqdtcp)
+		err = consumer.ConnectToNSQD(nsqAdminTcp)
 		if nil != err {
 			util.LogErr(err)
 			return

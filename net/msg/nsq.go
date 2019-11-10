@@ -4,29 +4,32 @@ import (
 	"github.com/ifls/gocore/util"
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"
+	"log"
 	"time"
 )
 
-var host string = "192.168.8.101"
-var nsqip = host
-var nsqAdmin string = nsqip + ":4171"       //nsqd 4171
-var nsqdtcp string = nsqip + ":4150"        //nsqadmin 4150
-var nsqdhttp string = nsqip + ":4151"       //nsqloopup 4151
-var nsqlookupdtcp string = nsqip + ":4160"  //nsqd 4160
-var nsqlookupdhttp string = nsqip + ":4161" //nsqlookup 4161
+var host = "192.168.8.101"
+var nsqIp = host
 
-var paddr string = nsqdtcp
+//var nsqAdmin string = nsqIp + ":4171"       //nsq 4171
+var nsqAdminTcp = nsqIp + ":4150" //nsqAdmin 4150
+//var nsqHttp string = nsqIp + ":4151"       //nsqLookup 4151
+//var nsqLookupTcp string = nsqIp + ":4160"  //nsq 4160
+var nsqLookupHttp = nsqIp + ":4161" //nsqLookup 4161
+
+var pAddr = nsqAdminTcp
 
 var received uint64 = 0
 
 var mhs []nsq.HandlerFunc
 
-func init() {
-	mhs = make([]nsq.HandlerFunc, 0)
-}
-
 var producer *nsq.Producer
 var consumer *nsq.Consumer
+
+func init() {
+	mhs = make([]nsq.HandlerFunc, 0)
+	log.Println(consumer)
+}
 
 func createProducer(addr string) *nsq.Producer {
 	producer, err := nsq.NewProducer(addr, nsq.NewConfig())
@@ -56,16 +59,16 @@ func Consumer(topic string, channel string, addr string) error {
 	return nil
 }
 
-func createNsqTopic() {
+//func createNsqTopic() {
+//
+//}
 
-}
-
-func AddMessageHandler(topic string, handle nsq.HandlerFunc) {
-	if topic != "" {
-
-		mhs = append(mhs, handle)
-	}
-}
+//func AddMessageHandler(topic string, handle nsq.HandlerFunc) {
+//	if topic != "" {
+//
+//		mhs = append(mhs, handle)
+//	}
+//}
 
 type H struct {
 	nsqConsumer *nsq.Consumer
@@ -78,7 +81,7 @@ func (h *H) HandleMessage(msg *nsq.Message) error {
 
 	for _, h := range mhs {
 		if h != nil {
-			h(msg)
+			_ = h(msg)
 			break
 		}
 	}
@@ -94,7 +97,7 @@ func PublicMessage(topic string, data []byte) {
 
 	//
 	if producer == nil {
-		producer = createProducer(paddr)
+		producer = createProducer(pAddr)
 		if producer == nil {
 			return
 		}
@@ -112,12 +115,12 @@ type NSQHandler struct {
 	handler func(*nsq.Message) error
 }
 
-func (this *NSQHandler) SetHandler(h func(*nsq.Message) error) {
-	this.handler = h
+func (n *NSQHandler) SetHandler(h func(*nsq.Message) error) {
+	n.handler = h
 }
 
-func (this *NSQHandler) HandleMessage(message *nsq.Message) error {
-	return this.handler(message)
+func (n *NSQHandler) HandleMessage(message *nsq.Message) error {
+	return n.handler(message)
 }
 
 func ConsumeMessage(topic string, channel string, handler func(*nsq.Message) error) {
@@ -130,7 +133,7 @@ func ConsumeMessage(topic string, channel string, handler func(*nsq.Message) err
 	nh := NSQHandler{handler: handler}
 
 	consumer.AddHandler(&nh)
-	err = consumer.ConnectToNSQD(nsqdtcp)
+	err = consumer.ConnectToNSQD(nsqAdminTcp)
 	if nil != err {
 		util.LogErr(err)
 		return

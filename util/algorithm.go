@@ -1,9 +1,6 @@
 package util
 
-func BubbleSort(array *[]int) {
-
-	var arr []int = *array
-
+func BubbleSort(arr []int) {
 	n := len(arr)
 	for i := 0; i < n; i++ {
 		for j := 0; j < n-i-1; j++ {
@@ -14,8 +11,4 @@ func BubbleSort(array *[]int) {
 			}
 		}
 	}
-}
-
-func isPalindrome() {
-
 }

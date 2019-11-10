@@ -14,7 +14,9 @@ func TestImage(t *testing.T) {
 		util.LogErr(err)
 		return
 	}
-	defer fd.Close()
+	defer func() {
+		_ = fd.Close()
+	}()
 
 	img, err := jpeg.Decode(fd)
 	if err != nil {
@@ -23,4 +25,8 @@ func TestImage(t *testing.T) {
 	}
 
 	util.DevInfo("%+v\n", img.Bounds())
+}
+
+func TestGetImageFileInfo(t *testing.T) {
+	GetImageFileInfo(nil)
 }

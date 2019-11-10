@@ -15,10 +15,7 @@ const n int = 150000
 func RandomSequence() []int {
 
 	var s []int
-
-	var i int = 0
-
-	for ; i < n; i++ {
+	for i := 0; i < n; i++ {
 		s = append(s, rand.Int())
 	}
 
@@ -35,14 +32,6 @@ func RandUint8() uint8 {
 
 func RandInt() int {
 	return rand.Int()
-}
-
-func Orderedseq() {
-
-}
-
-func Uniseq() {
-
 }
 
 func RandIntBetween(min, max int) int {

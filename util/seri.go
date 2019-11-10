@@ -26,7 +26,7 @@ func JsonDecode() string {
 }
 
 type User struct {
-	Uid      uint32 `json:uid`
-	Name     string `json:name`
-	Password string `json:pwd`
+	Uid      uint32 `json:"uid"`
+	Name     string `json:"name"`
+	Password string `json:"pwd"`
 }

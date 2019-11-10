@@ -14,7 +14,8 @@ type Reply struct {
 	C int
 }
 
-type Arith int
+type Arith struct {
+}
 
 func (t *Arith) Mul(ctx context.Context, args *Args, reply *Reply) error {
 	reply.C = args.A * args.B
@@ -25,4 +26,8 @@ func TestRpc(t *testing.T) {
 	//s := server.NewServer()
 	//s.RegisterName("Arith", new(Arith), "")
 	//s.Serve("tcp", ":8972")
+	err := Arith{}.Mul(nil, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 }

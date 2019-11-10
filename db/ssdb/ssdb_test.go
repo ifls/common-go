@@ -15,15 +15,15 @@ func TestSsdb(t *testing.T) {
 	}
 
 	var val interface{}
-	db.Set("a", "xxx")
+	_, _ = db.Set("a", "xxx")
 	val, err = db.Get("a")
 	fmt.Printf("%s\n", val)
-	db.Del("a")
+	_, _ = db.Del("a")
 	val, err = db.Get("a")
 	fmt.Printf("%s\n", val)
 
-	db.Do("zset", "z", "a", 3)
-	db.Do("multi_zset", "z", "b", -2, "c", 5, "d", 3)
+	_, _ = db.Do("zset", "z", "a", 3)
+	_, _ = db.Do("multi_zset", "z", "b", -2, "c", 5, "d", 3)
 	resp, err := db.Do("zrange", "z", 0, 10)
 	if err != nil {
 		os.Exit(1)
@@ -38,4 +38,8 @@ func TestSsdb(t *testing.T) {
 		fmt.Printf("  %s : %3s\n", resp[i], resp[i+1])
 	}
 	return
+}
+
+func TestS(t *testing.T) {
+	ssdbConn()
 }

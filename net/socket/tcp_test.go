@@ -5,7 +5,7 @@ import (
 )
 
 func TestSocketMain(t *testing.T) {
-	SocketMain()
+	t.Fatal(TcpMain())
 }
 
 func TestCli(*testing.T) {

@@ -122,7 +122,10 @@ func publicMessageN(client *pubsub.Client, topic string, n int) error {
 			id, err := res.Get(ctx)
 			if err != nil {
 				// Error handling code can be added here.
-				log.Output(1, fmt.Sprintf("Failed to publish: %v", err))
+				err := log.Output(1, fmt.Sprintf("Failed to publish: %v", err))
+				if err != nil {
+					log.Println(err)
+				}
 				atomic.AddUint64(&totalErrors, 1)
 				return
 			}
@@ -261,7 +264,7 @@ func testPubPermissions(c *pubsub.Client, topicName string) ([]string, error) {
 }
 
 const (
-	PUBSUB_CLIENT_VERSION = "0.0.1"
+	PubsubClientVersion = "0.0.1"
 )
 
 //列出项目所有订阅
@@ -286,7 +289,7 @@ func list(client *pubsub.Client) ([]*pubsub.Subscription, error) {
 
 func pullMsgs(client *pubsub.Client, subName string, topic *pubsub.Topic) error {
 	ctx := context.Background()
-
+	log.Println(topic)
 	// 异步拉取 n条消息
 	maxCount := 99999999999
 	var mu sync.Mutex
@@ -295,7 +298,7 @@ func pullMsgs(client *pubsub.Client, subName string, topic *pubsub.Topic) error 
 	cctx, cancel := context.WithCancel(ctx)
 	err := sub.Receive(cctx, func(ctx context.Context, msg *pubsub.Message) {
 		msg.Ack()
-		fmt.Printf(PUBSUB_CLIENT_VERSION+"->Got message: %q\n", string(msg.Data))
+		fmt.Printf(PubsubClientVersion+"->Got message: %q\n", string(msg.Data))
 		mu.Lock()
 		defer mu.Unlock()
 		received++
@@ -381,7 +384,7 @@ func updateEndpoint(client *pubsub.Client, subName string, endpoint string) erro
 }
 
 // 删除订阅
-func delete(client *pubsub.Client, subName string) error {
+func delete2(client *pubsub.Client, subName string) error {
 	ctx := context.Background()
 	// [START pubsub_delete_subscription]
 	sub := client.Subscription(subName)

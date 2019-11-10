@@ -28,7 +28,7 @@ func TestMongoInsertOne(t *testing.T) {
 		Uid:       int(util.NextId()) % 1000000,
 		Name:      "user100332",
 		Password:  "www",
-		LoginTime: time.Now().Format(util.TIME_FORMAT),
+		LoginTime: time.Now().Format(util.TimeFormat),
 	})
 	if err != nil {
 		util.LogErr(err)
@@ -57,7 +57,7 @@ func TestMongoApiInsertOne(t *testing.T) {
 		Uid:       int(util.NextId()) % 1000000,
 		Name:      "user100332",
 		Password:  "www",
-		LoginTime: time.Now().Format(util.TIME_FORMAT),
+		LoginTime: time.Now().Format(util.TimeFormat),
 	}
 
 	err := insertMongo(testMongoClient, "test", "user", user)
@@ -72,19 +72,19 @@ func TestMongoApiInsert(t *testing.T) {
 			Uid:       int(util.NextId()) % 1000000,
 			Name:      "user100332",
 			Password:  "www",
-			LoginTime: time.Now().Format(util.TIME_FORMAT),
+			LoginTime: time.Now().Format(util.TimeFormat),
 		},
 		MongoUser{
 			Uid:       int(util.NextId()) % 1000000,
 			Name:      "user100332",
 			Password:  "www",
-			LoginTime: time.Now().Format(util.TIME_FORMAT),
+			LoginTime: time.Now().Format(util.TimeFormat),
 		},
 		MongoUser{
 			Uid:       int(util.NextId()) % 1000000,
 			Name:      "user100332",
 			Password:  "www",
-			LoginTime: time.Now().Format(util.TIME_FORMAT),
+			LoginTime: time.Now().Format(util.TimeFormat),
 		},
 	}
 
@@ -103,19 +103,19 @@ func TestMongoInsert(t *testing.T) {
 			Uid:       int(util.NextId()) % 1000000,
 			Name:      "user100332",
 			Password:  "www",
-			LoginTime: time.Now().Format(util.TIME_FORMAT),
+			LoginTime: time.Now().Format(util.TimeFormat),
 		},
 		MongoUser{
 			Uid:       int(util.NextId()) % 1000000,
 			Name:      "user100332",
 			Password:  "www",
-			LoginTime: time.Now().Format(util.TIME_FORMAT),
+			LoginTime: time.Now().Format(util.TimeFormat),
 		},
 		MongoUser{
 			Uid:       int(util.NextId()) % 1000000,
 			Name:      "user100332",
 			Password:  "www",
-			LoginTime: time.Now().Format(util.TIME_FORMAT),
+			LoginTime: time.Now().Format(util.TimeFormat),
 		},
 	}
 
@@ -230,7 +230,7 @@ func TestMongoReplace(t *testing.T) {
 		Uid:       int(util.NextId()) % 1000000,
 		Name:      "user100332",
 		Password:  "www",
-		LoginTime: time.Now().Format(util.TIME_FORMAT),
+		LoginTime: time.Now().Format(util.TimeFormat),
 	}
 
 	ret, err := collection.ReplaceOne(ctx, bson.M{"name": "UserName_changed"}, user)

@@ -1,7 +1,5 @@
 package net
 
-import ()
-
 type APiUser struct {
 }
 

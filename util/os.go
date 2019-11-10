@@ -12,7 +12,7 @@ func PrintOS() {
 	//go switch 不需要break。因为自动添加了，但是如果有fallthrough, 则会向下执行多个label
 	//case 无须为常量和整数
 	//从上置下，短路
-	switch os := runtime.GOOS; os {
+	switch system := runtime.GOOS; system {
 	case "darwin":
 		log.Println("Mac OS X.")
 	case "linux":
@@ -20,7 +20,7 @@ func PrintOS() {
 	default:
 		// freebsd, openbsd,
 		// plan9, windows...
-		log.Printf("%s.\n", os)
+		log.Printf("%s.\n", system)
 	}
 }
 
@@ -48,7 +48,7 @@ func PrintOsInfo() {
 	time.Sleep(5 * time.Minute)
 }
 
-func getid(s string) {
+func GetTid(s string) {
 	pid := unix.Getpid()
 	log.Println(s+" Getpid", pid)
 	log.Println(s+" Getppid", unix.Getppid())

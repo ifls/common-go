@@ -10,7 +10,7 @@ func init() {
 }
 
 func TestCatalog(t *testing.T) {
-	catalog.Register(&api.CatalogRegistration{
+	_, _ = catalog.Register(&api.CatalogRegistration{
 		ID:      "catalog_service",
 		Node:    "local",
 		Address: "dfew",

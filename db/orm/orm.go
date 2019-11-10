@@ -13,8 +13,6 @@ type SqlCli struct {
 	url    string
 }
 
-var currentDb *xorm.Engine
-
 func MakeMysqlUrl(user, password, host string, port uint16, database string) string {
 	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?charset=utf8", user, password, "tcp", host, port, database)
 }

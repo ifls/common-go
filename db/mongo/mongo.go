@@ -12,17 +12,18 @@ import (
 	"time"
 )
 
-const mongoUrlFormat = "mongodb://%s:%d"
+//const mongoUrlFormat = "mongodb://%s:%d"
 
 var mongoUrl string
 
 var testMongoClient *mongo.Client
-var defaultMongoClient *mongo.Client
+
+//var defaultMongoClient *mongo.Client
 
 func init() {
 	client := prepare()
 	testMongoClient = client
-	defaultMongoClient = client
+	//defaultMongoClient = client
 }
 
 //连接指定环境mongo客户端
@@ -129,6 +130,6 @@ func DeleteMongo(c *mongo.Client, dbName string, tableName string, filter interf
 	return nil
 }
 
-func dispose() {
-
-}
+//func dispose() {
+//
+//}

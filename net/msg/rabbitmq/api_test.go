@@ -28,11 +28,16 @@ func TestConsume(t *testing.T) {
 }
 
 func TestPublish(t *testing.T) {
-	createExchange()
+	_ = createExchange()
 	for i := 0; i < 99; i++ {
 		err := publish()
 		if err != nil {
 			log.Println(err)
 		}
 	}
+}
+
+func TestR(t *testing.T) {
+	_ = queueBind()
+	confirmOne(nil)
 }

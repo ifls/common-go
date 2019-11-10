@@ -10,11 +10,12 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 const (
-	TEST_BUCKET = "dev_bucket-ifls"
-	GCP_OSS_URL = "https://storage.cloud.google.com/"
+	TestBucket = "dev_bucket-ifls"
+	GcpOssUrl  = "https://storage.cloud.google.com/"
 )
 
 var client *storage.Client
@@ -22,7 +23,7 @@ var client *storage.Client
 func init() {
 	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
 	if projectID == "" {
-		fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
+		_, _ = fmt.Fprintf(os.Stderr, "GOOGLE_CLOUD_PROJECT environment variable must be set.\n")
 		os.Exit(1)
 	}
 	var err error
@@ -34,17 +35,17 @@ func init() {
 	}
 }
 
-func createBucket() {
-
-}
-
-func listBucket() {
-
-}
-
-func getBucketInfo() {
-
-}
+//func createBucket() {
+//
+//}
+//
+//func listBucket() {
+//
+//}
+//
+//func getBucketInfo() {
+//
+//}
 
 type OnUploadSucc func(string)
 
@@ -70,7 +71,7 @@ func WriteGcpOssFromReader(reader io.Reader, bucket string, object string, cb On
 
 	if cb != nil {
 		util.LogInfo("write to gcp oss cb", zap.String("bucket", bucket), zap.String("objectName", object))
-		cb(GCP_OSS_URL + bucket + "/" + object)
+		cb(GcpOssUrl + bucket + "/" + object)
 	}
 
 	return nil
@@ -84,7 +85,9 @@ func ReadGcpOss(bucket string, object string) ([]byte, error) {
 		util.LogErr(err, zap.String("reason", "read from gcp oss error"))
 		return nil, err
 	}
-	defer rc.Close()
+	defer func() {
+		_ = rc.Close()
+	}()
 
 	data, err := ioutil.ReadAll(rc)
 	if err != nil {
@@ -94,42 +97,42 @@ func ReadGcpOss(bucket string, object string) ([]byte, error) {
 	return data, nil
 }
 
-func listObject() {
-
-}
-
-func getObjectInfo() {
-
-}
-
-func deleteObject() {
-
-}
-
-func renameObject() {
-
-}
-
-func moveObject() {
-
-}
-
-func lockObject() {
-
-}
-
-func public() {
-
-}
+//func listObject() {
+//
+//}
+//
+//func getObjectInfo() {
+//
+//}
+//
+//func deleteObject() {
+//
+//}
+//
+//func renameObject() {
+//
+//}
+//
+//func moveObject() {
+//
+//}
+//
+//func lockObject() {
+//
+//}
+//
+//func public() {
+//
+//}
 
 func GetDir(fileType string, filename string) string {
-	//now := time.Now()
+	now := time.Now()
 	var buf bytes.Buffer
-	//yearStr := now.Year()
-	//monthStr := int(now.Month())
-	//dayStr := now.Day()
+	yearStr := now.Year()
+	monthStr := int(now.Month())
+	dayStr := now.Day()
 
-	//fmt.Fprintf(&buf, "%s/%d/%02d/%02d/", fileType, yearStr, monthStr, dayStr)
-	fmt.Fprintf(&buf, "%s/%s/%0s/", filename[0:1], filename[1:3], filename[3:6])
+	_, _ = fmt.Fprintf(&buf, "%s/%d/%02d/%02d/", fileType, yearStr, monthStr, dayStr)
+	_, _ = fmt.Fprintf(&buf, "%s/%s/%0s/", filename[0:1], filename[1:3], filename[3:6])
 	return buf.String()
 }

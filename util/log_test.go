@@ -2,13 +2,13 @@ package util
 
 import (
 	"errors"
+	"fmt"
 	"go.uber.org/zap"
 	"testing"
 	"time"
 )
 
 func TestZap2(t *testing.T) {
-
 	LogInfo("log 初始化成功")
 	LogInfo("无法获取网址",
 		zap.String("url", "http://www.baidu.com"),
@@ -19,6 +19,10 @@ func TestZap2(t *testing.T) {
 	LogWarn("warn")
 
 	LogErr(errors.New("tt"), zap.String("tag", "eee"))
+	LogFatal("fail")
+	LogErrAndExit(fmt.Errorf("fail"))
+	LogStack()
+	LogCaller()
 }
 
 func BenchmarkLogFileSize(b *testing.B) {

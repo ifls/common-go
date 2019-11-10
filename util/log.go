@@ -16,7 +16,7 @@ import (
 var logger *zap.Logger
 
 const (
-	LOGTAG_REASON = "reason"
+	LogTagReason = "reason"
 )
 
 var logDir string
@@ -29,6 +29,7 @@ func init() {
 		logDir = "/data/logs"
 	}
 	Initdefault()
+	InitLogTest(nil, nil)
 }
 
 func InitLogTest(lw io.Writer, conn net.Conn) {
@@ -151,54 +152,73 @@ func InitLogger(l *zap.Logger) bool {
 		}
 		return false
 	}
-
-	return false
 }
 
 func LogDebug(msg string, fields ...zap.Field) {
 	logger.Debug(msg, fields...)
-	logger.Sync()
+	if err := logger.Sync(); err != nil {
+		log.Println(err)
+	}
+
 }
 
 func LogInfo(msg string, fields ...zap.Field) {
 	logger.Info(msg, fields...)
-	logger.Sync()
+	if err := logger.Sync(); err != nil {
+		log.Println(err)
+	}
 }
 
 func LogWarn(msg string, fields ...zap.Field) {
 	logger.Warn(msg, fields...)
-	logger.Sync()
+	if err := logger.Sync(); err != nil {
+		log.Println(err)
+	}
 }
 
 func LogError(msg string, fields ...zap.Field) {
 	logger.Error(msg, fields...)
-	logger.Sync()
+	if err := logger.Sync(); err != nil {
+		log.Println(err)
+	}
 }
 
 func LogFatal(msg string, fields ...zap.Field) {
-	defer logger.Sync()
 	logger.Fatal(msg, fields...)
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			log.Println(err)
+		}
+	}()
 }
 
 func LogErr(err error, fields ...zap.Field) {
 	if err != nil {
 		logger.Error("ERROR="+err.Error(), fields...)
-		logger.Sync()
+		if err := logger.Sync(); err != nil {
+			log.Println(err)
+		}
 	}
 }
 
 func LogErrReason(err error, reason string, fields ...zap.Field) {
 	fs := make([]zap.Field, 0)
-	fs = append(fs, zap.String(LOGTAG_REASON, reason))
+	fs = append(fs, zap.String(LogTagReason, reason))
 	fs = append(fs, fields...)
 	if err != nil {
 		logger.Error("error = "+err.Error(), fs...)
-		logger.Sync()
+		if err := logger.Sync(); err != nil {
+			log.Println(err)
+		}
 	}
 }
 
 func Log(level int, msg string, fields ...zap.Field) {
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			log.Println(err)
+		}
+	}()
 
 	switch zapcore.Level(level) {
 	case zapcore.DebugLevel:
@@ -218,7 +238,11 @@ func Log(level int, msg string, fields ...zap.Field) {
 
 func LogErrAndExit(err error, fields ...zap.Field) {
 	if err != nil {
-		defer logger.Sync()
+		defer func() {
+			if err := logger.Sync(); err != nil {
+				log.Println(err)
+			}
+		}()
 		logger.Fatal("FATAL="+err.Error(), fields...)
 	}
 }

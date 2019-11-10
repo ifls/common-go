@@ -33,54 +33,54 @@ import (
 
 func ToBytes(x interface{}) []byte {
 	bytesBuffer := bytes.NewBuffer([]byte{})
-	binary.Write(bytesBuffer, binary.BigEndian, x)
+	_ = binary.Write(bytesBuffer, binary.BigEndian, x)
 	return bytesBuffer.Bytes()
 }
 
 func UInt32ToBytes(x uint32) []byte {
 	bytesBuffer := bytes.NewBuffer([]byte{})
-	binary.Write(bytesBuffer, binary.BigEndian, x)
+	_ = binary.Write(bytesBuffer, binary.BigEndian, x)
 	return bytesBuffer.Bytes()
 }
 
 func BytesToInt32(b []byte) int32 {
 	bytesBuffer := bytes.NewBuffer(b)
 	var x int32
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
+	_ = binary.Read(bytesBuffer, binary.BigEndian, &x)
 	return x
 }
 
 func BytesToUInt32(b []byte) uint32 {
 	bytesBuffer := bytes.NewBuffer(b)
 	var x uint32
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
+	_ = binary.Read(bytesBuffer, binary.BigEndian, &x)
 	return x
 }
 
 func BytesToInt64(b []byte) int64 {
 	bytesBuffer := bytes.NewBuffer(b)
 	var x int64
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
+	_ = binary.Read(bytesBuffer, binary.BigEndian, &x)
 	return x
 }
 
 func BytesToUInt64(b []byte) uint64 {
 	bytesBuffer := bytes.NewBuffer(b)
 	var x uint64
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
+	_ = binary.Read(bytesBuffer, binary.BigEndian, &x)
 	return x
 }
 
 func BytesToFloat32(b []byte) float32 {
 	bytesBuffer := bytes.NewBuffer(b)
 	var x float32
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
+	_ = binary.Read(bytesBuffer, binary.BigEndian, &x)
 	return x
 }
 
 func BytesToFloat64(b []byte) float64 {
 	bytesBuffer := bytes.NewBuffer(b)
 	var x float64
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
+	_ = binary.Read(bytesBuffer, binary.BigEndian, &x)
 	return x
 }

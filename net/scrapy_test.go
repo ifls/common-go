@@ -5,8 +5,7 @@ import (
 	"github.com/gocolly/colly"
 	"github.com/ifls/gocore/io/file"
 	"github.com/ifls/gocore/util"
-	"go.uber.org/zap"
-	"io"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -29,23 +28,26 @@ type HtmlInfo struct {
 var imgUrls map[string]*ImgInfo
 var htmlUrls map[string]*HtmlInfo
 
-var downlaodQueue []string
+var downloadQueue []string
 var visitQueue []string
 var c *colly.Collector
 var allowedDomains []string
-var finalpath string
+var finalPath string
 
 func init() {
 	imgUrls = map[string]*ImgInfo{}
 	htmlUrls = map[string]*HtmlInfo{}
 
-	downlaodQueue = make([]string, 0)
+	downloadQueue = make([]string, 0)
 	visitQueue = make([]string, 0)
 	visitQueue = append(visitQueue, "http://pic.netbian.com/tupian/1.html")
 	allowedDomains = make([]string, 0)
 	allowedDomains = append(allowedDomains, "netbian.com", "pic.netbian.com")
-	finalpath = "/Users/ifls/Downloads/logs/imgs/" + strconv.Itoa(int(util.NextId())) + "/"
-	os.Mkdir(finalpath, os.ModePerm)
+	finalPath = "/Users/ifls/Downloads/logs/imgs/" + strconv.Itoa(int(util.NextId())) + "/"
+	err := os.Mkdir(finalPath, os.ModePerm)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func onFindImgUrl(element *colly.HTMLElement) {
@@ -62,7 +64,7 @@ func onFindImgUrl(element *colly.HTMLElement) {
 			suffix:     "",
 			downloaded: false,
 		}
-		downlaodQueue = append(downlaodQueue, url)
+		downloadQueue = append(downloadQueue, url)
 		//util.DevInfo("imgs len = %d\n", len(imgUrls))
 	}
 }
@@ -98,10 +100,10 @@ func onFindHtmlUrl(e *colly.HTMLElement) {
 }
 
 func scheDownload() {
-	if len(downlaodQueue) >= 1 {
-		fmt.Printf("download url img = %s\n", downlaodQueue[0])
-		go downloadImgUrl(downlaodQueue[0])
-		downlaodQueue = downlaodQueue[1:]
+	if len(downloadQueue) >= 1 {
+		fmt.Printf("download url img = %s\n", downloadQueue[0])
+		go downloadImgUrl(downloadQueue[0])
+		downloadQueue = downloadQueue[1:]
 	} else {
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -110,9 +112,9 @@ func scheDownload() {
 
 func downloadImgUrl(url string) {
 	if strings.Contains(url, "http") {
-		c.Visit(url)
+		_ = c.Visit(url)
 	} else {
-		c.Visit("http://pic.netbian.com" + url)
+		_ = c.Visit("http://pic.netbian.com" + url)
 	}
 }
 
@@ -132,8 +134,10 @@ func OnResponse(response *colly.Response) {
 
 	if imgUrls[url].downloaded == false {
 		filname := strings.ReplaceAll(url, "/", "_")
-		path := finalpath + filname
-		go response.Save(path)
+		path := finalPath + filname
+		go func(path string) {
+			response.Save(path)
+		}(path)
 		go WriteToGcpOss(response, url)
 		imgUrls[url].downloaded = true
 	}
@@ -157,7 +161,7 @@ func isImageUrl(url string) string {
 
 func scheVisit() {
 	if len(visitQueue) >= 1 {
-		c.Visit(visitQueue[0])
+		_ = c.Visit(visitQueue[0])
 		visitQueue = visitQueue[1:]
 	} else {
 		util.LogError("visited end ")
@@ -173,21 +177,8 @@ func start() {
 	scheVisit()
 }
 
-func copy_file(w io.Reader, url string) {
-	filname := strings.ReplaceAll(url, "/", "_")
-	path := "/Users/ifls/Downloads/logs/imgs/" + filname
-	f, err := os.Create(path)
-	if err != nil {
-		util.LogErr(err, zap.String("reason", "file create error"))
-	}
-	defer f.Close()
-
-	if _, err = io.Copy(f, w); err != nil {
-		util.LogErr(err, zap.String("reason", "data copy error"))
-	}
-	if err := f.Close(); err != nil {
-		util.LogErr(err, zap.String("reason", "file close error"))
-	}
+func TestCopyFile(t *testing.T) {
+	CopyFile(nil, "")
 }
 
 func TestScrapy(t *testing.T) {
@@ -246,12 +237,12 @@ func WriteToGcpOss(response *colly.Response, imgUrl string) {
 
 	hashKey := util.Sha256Hash(data)
 	name := util.Base64Encoding(hashKey)
-	filename := string(name)
+	filename := name
 
 	filename = filename + "." + subfix
 	object := file.GetDir(subfix, name) + filename
 
-	err := file.WriteGcpOss(data, file.TEST_BUCKET, object, func(ossUrl string) {
+	err := file.WriteGcpOss(data, file.TestBucket, object, func(ossUrl string) {
 		//fileStruct := gostruct.FileCore{
 		//	Name:       filename,
 		//	Suffix:     subfix,

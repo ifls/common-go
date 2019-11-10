@@ -12,12 +12,12 @@ func TestReadFile(t *testing.T) {
 	data, err := ReadFile(filepath)
 	util.DevInfo("%v", data)
 	util.LogErr(err)
-	WriteFile(data, "./test.jpg")
+	t.Error(WriteFile(data, "./test.jpg"))
 }
 
 func TestUpload(t *testing.T) {
 	filepath := "/Users/ifls/tt.jpg"
-	uploadGcpOssName(filepath, TEST_BUCKET)
+	t.Error(uploadGcpOssName(filepath, TestBucket))
 }
 
 func TestDownload(t *testing.T) {
@@ -35,8 +35,8 @@ func TestIsDir(t *testing.T) {
 }
 
 func TestWriteFile(t *testing.T) {
-	WriteFile([]byte("adfwe"), "../../test/temp_file/temp.txt")
-	allline, err := Readlines_buf("../../test/temp_file/temp.txt")
+	t.Error(WriteFile([]byte("adfwe"), "../../test/temp_file/temp.txt"))
+	allline, err := ReadlinesBuf("../../test/temp_file/temp.txt")
 	if err != nil {
 		t.Fatal("error occur")
 	}
@@ -54,7 +54,18 @@ func TestFileIOExist(t *testing.T) {
 
 func TestReadlines(t *testing.T) {
 	lines, err := Readlines("/Users/ifls/.bash_profile")
-	lines2, err2 := Readlines_buf("/Users/ifls/.bash_profile")
+	lines2, err2 := ReadlinesBuf("/Users/ifls/.bash_profile")
 	fmt.Println(len(lines), "&&", len(lines2))
 	util.Judge(len(lines) == len(lines2) && err == nil && err2 == nil, t)
+}
+
+func TestIsFile(t *testing.T) {
+	IsFile("")
+	_ = CreateDir("")
+	_ = DeleteDir("", true)
+	_ = WriteUrl(nil, "")
+	_, _ = ReadUrl("")
+	_ = downloadGcpOss("", "", "")
+
+	_ = uploadGcpOss("", "", "")
 }

@@ -9,7 +9,7 @@ func TestA(t *testing.T) {
 	//agent.Join("192.168.0.140", false)
 	//time.Sleep(50 * time.Second)
 
-	agent.ServiceRegister(&api.AgentServiceRegistration{
+	_ = agent.ServiceRegister(&api.AgentServiceRegistration{
 		Kind:    "kk",
 		ID:      "ee",
 		Name:    "ee2",

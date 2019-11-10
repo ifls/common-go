@@ -16,8 +16,8 @@ var (
 	routingKey   = "test-key"
 	queueKey     = "test-key"
 	body         = "foobar"
-	reliable     = true
-	queue        = "test_queue"
+	//reliable     = true
+	queue = "test_queue"
 )
 
 func init() {
@@ -45,7 +45,7 @@ func createExchange() error {
 		false,        // noWait
 		nil,          // arguments
 	); err != nil {
-		return fmt.Errorf("Exchange Declare: %s", err)
+		return fmt.Errorf("exchange Declare: %w", err)
 	}
 
 	return nil
@@ -68,7 +68,7 @@ func publish() error {
 			// a bunch of application/implementation-specific fields
 		},
 	); err != nil {
-		return fmt.Errorf("Exchange Publish: %s", err)
+		return fmt.Errorf("exchange Publish: %w", err)
 	}
 
 	return nil
@@ -84,7 +84,7 @@ func createQueue() (*amqp.Queue, error) {
 		nil,   // arguments
 	)
 	if err != nil {
-		return nil, fmt.Errorf("Queue Declare: %s", err)
+		return nil, fmt.Errorf("queue Declare: %w", err)
 	}
 
 	return &queue, nil
@@ -98,7 +98,7 @@ func queueBind() error {
 		false,    // noWait
 		nil,      // arguments
 	); err != nil {
-		return fmt.Errorf("Queue Bind: %s", err)
+		return fmt.Errorf("queue Bind: %w", err)
 	}
 
 	return nil
@@ -115,7 +115,7 @@ func consumer() error {
 		nil,      // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("Queue Consume: %s", err)
+		return fmt.Errorf("queue Consume: %w", err)
 	}
 
 	for {
@@ -124,8 +124,6 @@ func consumer() error {
 			log.Printf("msg = %s\n", d.Body)
 		}
 	}
-
-	return nil
 }
 
 func confirmOne(confirms <-chan amqp.Confirmation) {

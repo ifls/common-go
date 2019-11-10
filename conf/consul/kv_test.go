@@ -74,14 +74,12 @@ func TestApiPut(t *testing.T) {
 	err := Put(key, []byte(val))
 	if err != nil {
 		log.Fatal(err)
-		t.FailNow()
 	}
 
 	//get test
 	val2, err := Get(key)
 	if err != nil {
 		log.Fatal(err)
-		t.FailNow()
 	}
 	assert.Equal(t, val, string(val2))
 }
@@ -328,7 +326,9 @@ func TestAcquire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer session.Destroy(id, nil)
+	defer func() {
+		_, _ = session.Destroy(id, nil)
+	}()
 	log.Printf("id =%#v, writeMeta=%#v\n", id, wm)
 
 	pair := &api.KVPair{
