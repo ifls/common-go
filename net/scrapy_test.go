@@ -3,7 +3,7 @@ package net
 import (
 	"fmt"
 	"github.com/gocolly/colly"
-	"github.com/ifls/gocore/file"
+	"github.com/ifls/gocore/io/file"
 	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
 	"io"

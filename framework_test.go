@@ -3,7 +3,7 @@ package gocore
 import (
 	"flag"
 	"fmt"
-	"github.com/ifls/gocore/net"
+	"github.com/ifls/gocore/net/socket"
 	"os"
 	"testing"
 	"time"
@@ -53,7 +53,7 @@ func main() {
 		test()
 	} else if *cmd == "server" {
 		fmt.Println("server")
-		net.SocketMain()
+		socket.SocketMain()
 	}
 }
 

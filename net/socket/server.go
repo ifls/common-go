@@ -1,7 +1,8 @@
-package net
+package socket
 
 import (
 	"fmt"
+	net2 "github.com/ifls/gocore/net"
 	"github.com/ifls/gocore/util"
 	"go.uber.org/zap"
 	"net"
@@ -98,7 +99,7 @@ func Unpacket(buff []byte) ([]byte, []byte) {
 		return buff, nil
 	}
 
-	packetLength := int(BytesToUInt32(buff)) + 4
+	packetLength := int(net2.BytesToUInt32(buff)) + 4
 
 	if length < packetLength {
 		return buff, nil

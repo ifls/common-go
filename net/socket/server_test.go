@@ -1,4 +1,4 @@
-package net
+package socket
 
 import "testing"
 
