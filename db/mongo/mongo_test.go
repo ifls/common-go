@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/ifls/gocore/util"
 	"go.mongodb.org/mongo-driver/bson"
+	"log"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -15,137 +17,53 @@ type MongoUser struct {
 	LoginTime string
 }
 
-type MongoBook struct {
-	Bid  int
-	Name string
-}
+var testMongoClient Client
+var testDb string = "test"
 
-func TestMongoInsertOne(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-
-	ret, err := collection.InsertOne(ctx, MongoUser{
-		Uid:       int(util.NextId()) % 1000000,
-		Name:      "user100332",
-		Password:  "www",
-		LoginTime: time.Now().Format(util.TimeFormat),
-	})
+func init() {
+	url := "mongodb://23.91.101.147:27017"
+	client, err := NewClient(url)
 	if err != nil {
 		util.LogErr(err)
 	}
-
-	util.DevInfo("inserted id = %v", ret.InsertedID)
-}
-
-func TestCreateCollection(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("book")
-	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
-
-	ret, err := collection.InsertOne(ctx, MongoBook{
-		Bid:  int(util.NextId()) % 1000000,
-		Name: "book100332",
-	})
-	if err != nil {
-		util.LogErr(err)
-	}
-
-	util.DevInfo("inserted id = %v", ret.InsertedID)
-}
-
-func TestMongoApiInsertOne(t *testing.T) {
-	user := MongoUser{
-		Uid:       int(util.NextId()) % 1000000,
-		Name:      "user100332",
-		Password:  "www",
-		LoginTime: time.Now().Format(util.TimeFormat),
-	}
-
-	err := insertMongo(testMongoClient, "test", "user", user)
-	if err != nil {
-		util.LogErr(err)
-	}
+	testMongoClient = client
 }
 
 func TestMongoApiInsert(t *testing.T) {
-	users := []interface{}{
-		MongoUser{
-			Uid:       int(util.NextId()) % 1000000,
-			Name:      "user100332",
-			Password:  "www",
-			LoginTime: time.Now().Format(util.TimeFormat),
-		},
-		MongoUser{
-			Uid:       int(util.NextId()) % 1000000,
-			Name:      "user100332",
-			Password:  "www",
-			LoginTime: time.Now().Format(util.TimeFormat),
-		},
-		MongoUser{
-			Uid:       int(util.NextId()) % 1000000,
-			Name:      "user100332",
-			Password:  "www",
-			LoginTime: time.Now().Format(util.TimeFormat),
-		},
+	rd := int(util.NextId()) % 1000000
+	user := MongoUser{
+		Uid:       rd,
+		Name:      "user" + strconv.Itoa(rd),
+		Password:  "www",
+		LoginTime: time.Now().Format(util.TimeFormat),
 	}
-
-	err := insertMongo(testMongoClient, "test", "user", users...)
+	user2 := user
+	user2.Password = "ccc"
+	err := testMongoClient.Insert(testDb, "user", user, user2)
 	if err != nil {
-		util.LogErr(err)
+		t.Fatal(err)
 	}
-}
-
-func TestMongoInsert(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-
-	users := []interface{}{
-		MongoUser{
-			Uid:       int(util.NextId()) % 1000000,
-			Name:      "user100332",
-			Password:  "www",
-			LoginTime: time.Now().Format(util.TimeFormat),
-		},
-		MongoUser{
-			Uid:       int(util.NextId()) % 1000000,
-			Name:      "user100332",
-			Password:  "www",
-			LoginTime: time.Now().Format(util.TimeFormat),
-		},
-		MongoUser{
-			Uid:       int(util.NextId()) % 1000000,
-			Name:      "user100332",
-			Password:  "www",
-			LoginTime: time.Now().Format(util.TimeFormat),
-		},
-	}
-
-	ret, err := collection.InsertMany(ctx, users)
-	if err != nil {
-		util.LogErr(err)
-	}
-
-	util.DevInfo("insert result = %+v", ret)
-}
-
-func TestMongoFindOne(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	ret2 := collection.FindOne(ctx, bson.M{"name": "user100332"})
-	if ret2.Err() != nil {
-		util.LogErr(ret2.Err())
-	}
-	var user1 MongoUser
-	if err := ret2.Decode(&user1); err != nil {
-		util.LogErr(err)
-	}
-	util.DevInfo("%+v\n", user1)
 }
 
 func TestMongoApiFindOne(t *testing.T) {
-	ret, err := FindOneMongo(testMongoClient, "test", "user", bson.M{"name": "user100332"})
-	if err != nil {
-		util.LogErr(err)
+	rd := int(util.NextId()) % 1000000
+	user := MongoUser{
+		Uid:       rd,
+		Name:      "user" + strconv.Itoa(rd),
+		Password:  "www",
+		LoginTime: time.Now().Format(util.TimeFormat),
 	}
+	err := testMongoClient.Insert(testDb, "user", user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ret, err := testMongoClient.FindOne(testDb, "user", bson.M{"name": "user" + strconv.Itoa(rd)})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	log.Printf("mongo.singleResult = %#v\n", ret)
 	var user1 MongoUser
 	if err := ret.Decode(&user1); err != nil {
 		util.LogErr(err)
@@ -154,31 +72,12 @@ func TestMongoApiFindOne(t *testing.T) {
 }
 
 func TestMongoApiFind(t *testing.T) {
-	cur, err := FindManyMongo(testMongoClient, "test", "user", bson.M{"name": "user100332"})
+	cur, err := testMongoClient.FindMany(testDb, "user", bson.M{"password": "www"})
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
-
+	log.Printf("Cursor = %#v\n", cur)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	for cur.Next(ctx) {
-		var user1 MongoUser
-		if err := cur.Decode(&user1); err != nil {
-			util.LogErr(err)
-		}
-		util.DevInfo("%+v\n", user1)
-	}
-}
-
-func TestMongoFind(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	cur, err := collection.Find(ctx, bson.M{"name": "user100332"})
-	if err != nil {
-		util.LogErr(err)
-		return
-	}
-
 	for cur.Next(ctx) {
 		var user1 MongoUser
 		if err := cur.Decode(&user1); err != nil {
@@ -189,89 +88,82 @@ func TestMongoFind(t *testing.T) {
 }
 
 func TestMongoUpdateOne(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
+	collection := testMongoClient.Database(testDb).Collection("user")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 
 	ret, err := collection.UpdateOne(ctx, bson.M{"name": "user100332"}, bson.M{"$set": bson.M{"name": "UserName_changed"}})
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
 
 	util.DevInfo("update one result %+v\n", ret)
 }
 
-func TestMongoUpdate(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
+func TestMongoUpdateMany(t *testing.T) {
+	collection := testMongoClient.Database(testDb).Collection("user")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 
 	ret, err := collection.UpdateMany(ctx, bson.M{"name": "user100332"}, bson.M{"$set": bson.M{"name": "UserName_changed"}})
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
 
 	util.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoApiUpdate(t *testing.T) {
-	err := UpdateMongo(testMongoClient, "test", "user", bson.M{"name": "user100332"}, bson.M{"$set": bson.M{"name": "UserName_changed"}})
+	ret, err := testMongoClient.Update(testDb, "user", bson.M{"name": "user100332"}, bson.M{"$set": bson.M{"name": "UserName_changed"}}, false)
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
+
+	log.Printf("updateResult = %#v\n", ret)
 }
 
-func TestMongoReplace(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-
+func TestMongoReplaceOne(t *testing.T) {
 	user := MongoUser{
 		Uid:       int(util.NextId()) % 1000000,
-		Name:      "user100332",
+		Name:      "user100332x",
 		Password:  "www",
 		LoginTime: time.Now().Format(util.TimeFormat),
 	}
 
-	ret, err := collection.ReplaceOne(ctx, bson.M{"name": "UserName_changed"}, user)
+	ret, err := testMongoClient.ReplaceOne(testDb, "user", bson.M{"password": "www"}, user)
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
 
-	util.DevInfo("update one result %+v\n", ret)
+	util.DevInfo("replaceOne %+v\n", ret)
 }
 
 func TestMongoDeleteOne(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
+	collection := testMongoClient.Database(testDb).Collection("user")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 
 	ret, err := collection.DeleteOne(ctx, bson.M{"name": "user100332"})
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
 
 	util.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoDelete(t *testing.T) {
-	collection := testMongoClient.Database("test").Collection("user")
+	collection := testMongoClient.Database(testDb).Collection("user")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 
 	ret, err := collection.DeleteMany(ctx, bson.M{"name": "UserName_changed"})
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
 
 	util.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoApiDelete(t *testing.T) {
-	err := DeleteMongo(testMongoClient, "test", "user", bson.M{"name": "user100332"})
+	ret, err := testMongoClient.Delete(testDb, "user", bson.M{"name": "user100332"}, false)
 	if err != nil {
-		util.LogErr(err)
-		return
+		t.Fatal(err)
 	}
+	log.Printf("deleteResult =  %#v\n", ret)
 }

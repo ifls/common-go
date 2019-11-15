@@ -30,9 +30,13 @@ var testCli SqlCli
 func init() {
 	//host := "47.107.151.251"
 	host := "23.91.101.147"
-	password := "#Wfs123456"
+	password := "wfs123456"
+	port := 3306
+	//host = "cdb-f7xumu0z.gz.tencentcdb.com"
+	//password = "wfs123456"
+	//port = 10016
 	driver := "mysql"
-	url := MakeMysqlUrl("root", password, host, 3306, "test")
+	url := MakeMysqlUrl("root", password, host, uint16(port), "test")
 	cli, err := Open(driver, url)
 	if err != nil {
 		log.Fatal(err)
@@ -96,6 +100,26 @@ func TestSqlCli_Insert(t *testing.T) {
 	err := testCli.Insert(acc1, acc2)
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestSqlCli_InsertPer(t *testing.T) {
+	n := 10
+	for i := 0; i < n; i++ {
+		acc1 := Account{
+			Name:    strconv.Itoa(rand.Int()),
+			Balance: rand.Float64() * 100,
+			Version: "1.1",
+		}
+		acc2 := Account{
+			Name:    strconv.Itoa(rand.Int()),
+			Balance: rand.Float64() * 100,
+			Version: "1.2",
+		}
+		err := testCli.Insert(acc1, acc2)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 

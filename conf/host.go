@@ -11,10 +11,6 @@ const (
 
 var defaultEnv string = ENVIR_LOCAL
 
-func GetHost() {
-	//key := defaultEnv + "/"
-}
-
 func GetService() {
 
 }

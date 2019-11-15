@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	ip := "47.107.151.251"
+	ip := "23.91.101.147"
 	redisUrl = ip + ":6379"
 	_, err := Open(redisUrl)
 	if err != nil {
@@ -55,12 +55,18 @@ func TestRedisConn(t *testing.T) {
 
 func TestKGet(t *testing.T) {
 	key := "test_key"
-	val, err := KGet(key)
+	val := "3333"
+	err := KSet(key, val)
+	if err != nil {
+		t.Fatalf("redis set error, err=%v", err)
+	}
+
+	val2, err := KGet(key)
 	if err != nil {
 		t.Fatalf("redis get error, err=%v", err)
 	}
 	//util.DevInfo("%s:[%s]\n", key, val)
-	assert.Equal(t, "3333", string(val.([]uint8)), "get value is diff")
+	assert.Equal(t, "3333", string(val2.([]uint8)), "get value is diff")
 }
 
 func TestKSet(t *testing.T) {
@@ -109,33 +115,6 @@ func TestKDel(t *testing.T) {
 	assert.Equal(t, nil, val3)
 }
 
-func TestHMGet(t *testing.T) {
-	reply, err := HMGet("test_hash", "name1", "code1")
-	if err != nil {
-		t.Fatal(err)
-	}
-	vals := []string{"he2", "yifeng2"}
-	//vals array
-	for i, v := range reply {
-		//util.DevInfo("%v:%s", i, v)
-		assert.Equal(t, vals[i], string(v.([]uint8)), "hmget value is diff")
-	}
-}
-
-func TestHGetAll(t *testing.T) {
-	reply, err := HGetAll("test_all_hash")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	vals := []string{"key1", "val1", "key2", "val2"}
-	//vals array
-	for i, v := range reply {
-		//util.DevInfo("%v:%s", i, v)
-		assert.Equal(t, vals[i], string(v.([]uint8)), "hmget value is diff")
-	}
-}
-
 func TestHMSet(t *testing.T) {
 	kvs := make([]interface{}, 0)
 	kvs = append(kvs, "name1")
@@ -161,6 +140,33 @@ func TestHMSet(t *testing.T) {
 		//util.DevInfo("%s\n", kvs[2*i + 1])
 		v2 := string(v.([]byte))
 		assert.Equal(t, kvs[2*i+1], v2, "hmset error value is diff")
+	}
+}
+
+func TestHMGet(t *testing.T) {
+	reply, err := HMGet("test_hash", "name1", "code1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	vals := []string{"he2", "yifeng2"}
+	//vals array
+	for i, v := range reply {
+		//util.DevInfo("%v:%s", i, v)
+		assert.Equal(t, vals[i], string(v.([]uint8)), "hmget value is diff")
+	}
+}
+
+func TestHGetAll(t *testing.T) {
+	reply, err := HGetAll("test_all_hash")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	vals := []string{"key1", "val1", "key2", "val2"}
+	//vals array
+	for i, v := range reply {
+		//util.DevInfo("%v:%s", i, v)
+		assert.Equal(t, vals[i], string(v.([]uint8)), "hmget value is diff")
 	}
 }
 

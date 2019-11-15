@@ -43,7 +43,7 @@ func (h *ConsumerHandler) HandleMessage(message *nsq.Message) error {
 
 func TestProducerConnection(t *testing.T) {
 	config := nsq.NewConfig()
-	host := "global.GetHost(global.ENVIR_DEVTES"
+	host := "global.GetHostIpIp(global.ENVIR_DEVTES"
 
 	//config.LocalAddr, _ = net.ResolveTCPAddr("tcp", "127.0.0.1:30001")
 

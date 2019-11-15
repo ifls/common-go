@@ -137,6 +137,7 @@ func KSet(key string, value interface{}) error {
 	return kSet(redisClient, key, value)
 }
 
+//拿不到会被一直阻塞
 func KGet(key string) (interface{}, error) {
 	if err := commonCheck(redisClient); err != nil {
 		return nil, err

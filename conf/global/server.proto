@@ -1,0 +1,65 @@
+//proto.proto
+syntax = "proto3";
+
+package global;
+
+enum ServerType {
+	T_UNKNOWN = 0;
+	//日志
+	T_LOG = 1;
+	//web
+	T_WEB = 2;
+	//代理
+	T_PROXY = 3;
+	//nginx
+	T_NGINX = 4;
+	//redis
+	T_REDIS = 5;
+	//mysql数据库
+	T_MYSQL = 6;
+	//tidb数据库
+	T_TIDB = 7;
+	//消息队列
+	T_NSQ = 8;
+	//广播服务器
+	T_BR = 9;
+	//统计服务器
+	T_STAT = 10;
+	//排行榜服务器
+	T_RANK = 11;
+	//数据库中间件代理
+	T_DBPROXY = 12;
+	//文件服务器
+	T_FILE = 13;
+	//cdn
+	T_CDN = 14;
+	//四层负载均衡
+	T_LVS = 15;
+	//流处理
+	T_STREAM = 16;
+	//数据分析
+	T_ANAL = 17;
+	//管理后台
+	T_ADMIN = 18;
+	//监控服务器
+	T_MONITOR = 19;
+	//爬虫服务器
+	T_SCRAPY = 20;
+	T_ETCD = 21;
+	T_MONGO = 22;
+	T_SSDB = 23;
+}
+
+enum ServerPort {
+	UNKNOWN = 0;
+	LOG = 30001;
+	MONGO = 27017;
+	REDIS = 6379;
+	MYSQL = 3306;
+	TIDB = 4000;
+	WEB	= 8080;
+	ETCD = 2379;
+	SCRAPY = 7778;
+	NSQ = 4150;
+	SSDB = 8888;
+}

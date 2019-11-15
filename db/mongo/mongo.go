@@ -4,54 +4,49 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/ifls/gocore/util"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"go.uber.org/zap"
 	"time"
 )
 
 //const mongoUrlFormat = "mongodb://%s:%d"
 
-var mongoUrl string
-
-var testMongoClient *mongo.Client
-
-//var defaultMongoClient *mongo.Client
-
-func init() {
-	client := prepare()
-	testMongoClient = client
-	//defaultMongoClient = client
+type Client struct {
+	*mongo.Client
 }
 
-//连接指定环境mongo客户端
-func prepare() *mongo.Client {
-	mongoUrl = ""
+var timeout int = 5
+
+func init() {
+
+}
+
+//返回连接指定url的mongo客户端
+func NewClient(mongoUrl string) (Client, error) {
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoUrl))
 	if err != nil {
-		util.LogErr(err)
+		return Client{}, fmt.Errorf("mongo.NewClient err =%w, url = %s\n", err, mongoUrl)
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
 	err = client.Connect(ctx)
 	if err != nil {
-		util.LogErr(err, zap.String("reason", "ping error mongo url = "+mongoUrl))
+		return Client{}, fmt.Errorf("client.connect err =%w, url = %s\n", err, mongoUrl)
 	}
 
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		util.LogErr(err, zap.String("reason", "ping error mongo url = "+mongoUrl))
+		return Client{}, fmt.Errorf("client.Ping err =%w, url = %s\n", err, mongoUrl)
 	}
-	return client
+	return Client{client}, nil
 }
 
-//支持插入，一行和多行， 指定数据库和表名会自动创建
-func insertMongo(c *mongo.Client, dbName string, tableName string, docs ...interface{}) error {
+//支持插入，一行或者多行， 指定数据库和表名会自动创建
+func (c Client) Insert(dbName string, tableName string, docs ...interface{}) error {
 	col := c.Database(dbName).Collection(tableName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
 	cols := make([]interface{}, 0)
 	cols = append(cols, docs...)
@@ -59,17 +54,25 @@ func insertMongo(c *mongo.Client, dbName string, tableName string, docs ...inter
 	if len(docs) > 1 {
 		ret, err := col.InsertMany(ctx, cols)
 		if err != nil {
-			util.LogErrReason(err, "insertMany error")
-			return err
+			return fmt.Errorf("insertOne err = %w", err)
 		}
-		util.LogInfo(fmt.Sprintf("%+v\n", ret))
+
+		if ret == nil {
+			return fmt.Errorf("insert id is error")
+		}
+
+		if len(ret.InsertedIDs) != len(docs) {
+			return fmt.Errorf("want insert %d, but insert %d, error", len(docs), len(ret.InsertedIDs))
+		}
+
 	} else if len(docs) == 1 {
 		ret, err := col.InsertOne(ctx, docs[0])
 		if err != nil {
-			util.LogErrReason(err, "insertOne error")
-			return err
+			return fmt.Errorf("insertOne err = %w\n", err)
 		}
-		util.LogInfo(fmt.Sprintf("%+v\n", ret))
+		if ret == nil {
+			return fmt.Errorf("insert id is error")
+		}
 	} else {
 		return errors.New("insert params error")
 	}
@@ -78,58 +81,77 @@ func insertMongo(c *mongo.Client, dbName string, tableName string, docs ...inter
 }
 
 //返回多行迭代器
-func FindManyMongo(c *mongo.Client, dbName string, tableName string, filter interface{}) (*mongo.Cursor, error) {
+func (c Client) FindMany(dbName string, tableName string, filter interface{}) (*mongo.Cursor, error) {
 	col := c.Database(dbName).Collection(tableName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
 	cur, err := col.Find(ctx, filter)
 	if err != nil {
-		util.LogErr(err)
-		return nil, err
+		return nil, fmt.Errorf("findMany err =%w\n", err)
 	}
 	return cur, nil
 }
 
 //返回单行结果
-func FindOneMongo(c *mongo.Client, dbName string, tableName string, filter interface{}) (*mongo.SingleResult, error) {
+func (c Client) FindOne(dbName string, tableName string, filter interface{}) (*mongo.SingleResult, error) {
 	col := c.Database(dbName).Collection(tableName)
-	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
+	//一个都找不到也是error
 	ret := col.FindOne(ctx, filter)
 	if ret.Err() != nil {
-		util.LogErrReason(ret.Err(), "FindOne error")
-		return nil, ret.Err()
+		return nil, fmt.Errorf("findOne err = %w\n", ret.Err())
 	}
 	return ret, nil
 }
 
-func UpdateMongo(c *mongo.Client, dbName string, tableName string, filter interface{}, update interface{}) error {
+func (c Client) Update(dbName string, tableName string, filter interface{}, update interface{}, onlyOne bool) (*mongo.UpdateResult, error) {
 	col := c.Database(dbName).Collection(tableName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
-	ret, err := col.UpdateMany(ctx, filter, update)
-	if err != nil {
-		util.LogErr(err)
-		return err
-	}
-	util.DevInfo("update one result %+v\n", ret)
-	return nil
-}
-
-func DeleteMongo(c *mongo.Client, dbName string, tableName string, filter interface{}) error {
-	col := c.Database(dbName).Collection(tableName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-
-	ret, err := col.DeleteMany(ctx, filter)
-	if err != nil {
-		util.LogErr(err)
-		return err
+	var ret *mongo.UpdateResult
+	var err error
+	if onlyOne {
+		ret, err = col.UpdateMany(ctx, filter, update)
+	} else {
+		ret, err = col.UpdateMany(ctx, filter, update)
 	}
 
-	util.DevInfo("update one result %+v\n", ret)
-	return nil
+	if err != nil {
+		return nil, fmt.Errorf("update err = %w", err)
+	}
+
+	return ret, nil
 }
 
-//func dispose() {
-//
-//}
+func (c Client) ReplaceOne(dbName string, tableName string, filter interface{}, replace interface{}) (*mongo.UpdateResult, error) {
+	col := c.Database(dbName).Collection(tableName)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+
+	ret, err := col.ReplaceOne(ctx, filter, replace)
+	if err != nil {
+		return nil, fmt.Errorf("raplace err = %w", err)
+	}
+
+	return ret, nil
+}
+
+//删除所有匹配的
+func (c Client) Delete(dbName string, tableName string, filter interface{}, onlyOne bool) (int64, error) {
+	col := c.Database(dbName).Collection(tableName)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+
+	var ret *mongo.DeleteResult
+	var err error
+	if onlyOne {
+		ret, err = col.DeleteMany(ctx, filter)
+	} else {
+		ret, err = col.DeleteMany(ctx, filter)
+	}
+
+	if err != nil {
+		return 0, fmt.Errorf("delete err = %w", err)
+	}
+
+	return ret.DeletedCount, nil
+}

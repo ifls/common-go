@@ -29,7 +29,7 @@ func init() {
 		logDir = "/data/logs"
 	}
 	Initdefault()
-	InitLogTest(nil, nil)
+	//InitLogTest(nil, nil)
 }
 
 func InitLogTest(lw io.Writer, conn net.Conn) {
