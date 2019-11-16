@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ifls/gocore/util"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"strconv"
 	"testing"
@@ -166,4 +167,43 @@ func TestMongoApiDelete(t *testing.T) {
 		t.Fatal(err)
 	}
 	log.Printf("deleteResult =  %#v\n", ret)
+}
+
+func TestMongoAggregate(t *testing.T) {
+	collection := testMongoClient.Database(testDb).Collection("log")
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+
+	curs, err := collection.Aggregate(ctx, mongo.Pipeline{bson.D{
+		{"$group", bson.D{
+			{"_id", nil},
+			{"max", bson.D{
+				{"$max", "$logid"},
+			}},
+		}},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	util.DevInfo("update one result %+v\n", curs)
+	if curs == nil {
+		t.Fatal("nil")
+	}
+	//var data struct{}
+	//err = curs.All(ctx, &data)
+	//if err != nil {
+	//	t.Fatalf("all %s\n", err)
+	//}
+	//log.Printf("data %+v\n", data)
+	for curs.Next(ctx) {
+		var user1 struct {
+			_id string
+			Max int
+		}
+
+		if err := curs.Decode(&user1); err != nil {
+			util.LogErr(err)
+		}
+		util.DevInfo("%+v\n", user1)
+	}
 }

@@ -3,24 +3,38 @@ package util
 import (
 	"github.com/bwmarrin/snowflake"
 	"github.com/google/uuid"
-	"go.uber.org/zap"
+	"log"
+	"os"
 )
 
-var node *snowflake.Node
+var currentNode *snowflake.Node
+var nodeId int64
 
 func init() {
-	var err error
+	nodeId := int64(os.Getpid() % 1024)
 	//节点id需要自己分配
-	node, err = snowflake.NewNode(1)
+	node, err := snowflake.NewNode(nodeId)
 	if err != nil {
-		LogErr(err, zap.String("reason", "snowflake node error"))
+		//LogErr(err, zap.String("reason", "snowflake node error"))
+		log.Fatal(err)
+	}
+	currentNode = node
+}
+
+//必须是0-1023
+func InitNode(nodeId int64) {
+	//节点id需要自己分配
+	node, err := snowflake.NewNode(nodeId % 1024)
+	if err != nil {
+		//LogErr(err, zap.String("reason", "snowflake node error"))
 		return
 	}
+	currentNode = node
 }
 
 //snowflake 分布式唯一
 func NextId() int64 {
-	return node.Generate().Int64()
+	return currentNode.Generate().Int64()
 }
 
 /**
@@ -35,13 +49,13 @@ func UuidBinary() []byte {
 	return data
 }
 
-func UuidText() []byte {
+func UuidText() string {
 	data, err := uuid.New().MarshalText()
 	if err != nil {
 		LogErr(err)
-		return nil
+		return ""
 	}
-	return data
+	return string(data)
 }
 
 func Uuid() uint32 {

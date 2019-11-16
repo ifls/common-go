@@ -30,7 +30,7 @@ var testCli SqlCli
 func init() {
 	//host := "47.107.151.251"
 	host := "23.91.101.147"
-	password := "wfs123456"
+	password := "123456"
 	port := 3306
 	//host = "cdb-f7xumu0z.gz.tencentcdb.com"
 	//password = "wfs123456"
