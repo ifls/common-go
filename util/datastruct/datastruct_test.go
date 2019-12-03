@@ -1,4 +1,4 @@
-package util
+package datastruct
 
 import (
 	"container/list"
