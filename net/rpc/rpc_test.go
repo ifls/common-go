@@ -19,6 +19,7 @@ type Arith struct {
 
 func (t *Arith) Mul(ctx context.Context, args *Args, reply *Reply) error {
 	reply.C = args.A * args.B
+
 	return nil
 }
 

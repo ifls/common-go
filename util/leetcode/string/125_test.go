@@ -25,8 +25,26 @@ func init() {
 	}
 }
 
-func Test125(t *testing.T) {
+func TestIsPalindrome1(t *testing.T) {
 	for _, testdata := range testdatas {
-		assert.Equal(t, testdata.result, isPalindrome(testdata.param))
+		assert.Equal(t, testdata.result, IsPalindrome1(testdata.param))
+	}
+}
+
+func BenchmarkIsPalindrome1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		IsPalindrome1(testdatas[0].param)
+	}
+}
+
+func TestIsPalindrome2(t *testing.T) {
+	for _, testdata := range testdatas {
+		assert.Equal(t, testdata.result, IsPalindrome2(testdata.param))
+	}
+}
+
+func BenchmarkIsPalindrome2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		IsPalindrome2(testdatas[0].param)
 	}
 }
