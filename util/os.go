@@ -1,7 +1,6 @@
 package util
 
 import (
-	"golang.org/x/sys/unix"
 	"log"
 	"os"
 	"runtime"
@@ -46,23 +45,4 @@ func PrintOsInfo() {
 	log.Printf("os.Getwd() = %#v\n", dir)
 	//log.Printf("os.Getpagesize() = %v\n", os.Getegid())
 	time.Sleep(5 * time.Minute)
-}
-
-func GetTid(s string) {
-	pid := unix.Getpid()
-	log.Println(s+" Getpid", pid)
-	log.Println(s+" Getppid", unix.Getppid())
-
-	pgid, _ := unix.Getpgid(pid)
-	log.Println(s+" Getpgid", pgid)
-
-	//log.Println(s+" Gettid", unix.ge())
-
-	sid, _ := unix.Getsid(pid)
-	log.Println(s+" Getsid", sid)
-
-	log.Println(s+" Getegid", unix.Getegid())
-	log.Println(s+" Geteuid", unix.Geteuid())
-	log.Println(s+" Getgid", unix.Getgid())
-	log.Println(s+" Getuid", unix.Getuid())
 }
