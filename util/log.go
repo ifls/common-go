@@ -133,6 +133,16 @@ func Initdefault() {
 	}
 }
 
+func FuncName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	return runtime.FuncForPC(pc).Name()
+}
+
+func CallerName() string {
+	pc, _, _, _ := runtime.Caller(2)
+	return runtime.FuncForPC(pc).Name()
+}
+
 /***********************log API ***********************/
 
 func InitLogger(l *zap.Logger) bool {
@@ -193,6 +203,7 @@ func LogFatal(msg string, fields ...zap.Field) {
 }
 
 func LogDebugf(msg string, fields ...interface{}) {
+	//fields = append(fields, zap.String("func", FuncName()))
 	logger.Sugar().Debugf(msg, fields...)
 	defer func() {
 		if err := logger.Sync(); err != nil {
@@ -203,12 +214,18 @@ func LogDebugf(msg string, fields ...interface{}) {
 
 func LogErr(err error, fields ...zap.Field) {
 	if err != nil {
-		LogStack()
+		//LogStack()
 		logger.Error("error = "+err.Error(), fields...)
 		if err := logger.Sync(); err != nil {
 			log.Println(err)
 		}
 	}
+}
+
+func RetErr(err error, format string, a ...interface{}) error {
+	a = append(a, CallerName())
+	a = append(a, err)
+	return fmt.Errorf("func = %s, err = %s, "+format, a...)
 }
 
 func Log(level int, msg string, fields ...zap.Field) {
