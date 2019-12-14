@@ -192,21 +192,19 @@ func LogFatal(msg string, fields ...zap.Field) {
 	}()
 }
 
-func LogErr(err error, fields ...zap.Field) {
-	if err != nil {
-		logger.Error("ERROR="+err.Error(), fields...)
+func LogDebugf(msg string, fields ...interface{}) {
+	logger.Sugar().Debugf(msg, fields...)
+	defer func() {
 		if err := logger.Sync(); err != nil {
 			log.Println(err)
 		}
-	}
+	}()
 }
 
-func LogErrReason(err error, reason string, fields ...zap.Field) {
-	fs := make([]zap.Field, 0)
-	fs = append(fs, zap.String(LogTagReason, reason))
-	fs = append(fs, fields...)
+func LogErr(err error, fields ...zap.Field) {
 	if err != nil {
-		logger.Error("error = "+err.Error(), fs...)
+		LogStack()
+		logger.Error("error = "+err.Error(), fields...)
 		if err := logger.Sync(); err != nil {
 			log.Println(err)
 		}

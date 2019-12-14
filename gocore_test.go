@@ -77,5 +77,7 @@ func TestNsq(t *testing.T) {
 }
 
 func TestNsqHandler_HandleMessage(t *testing.T) {
-	//msg.wait()
+	for i := 0; i < 5; i++ {
+		log.Println(i)
+	}
 }
