@@ -3,8 +3,6 @@ package net
 import (
 	"fmt"
 	"github.com/gocolly/colly"
-	_ "github.com/henrylee2cn/pholcus/demo/pholcus_lib" // 此为公开维护的spider规则库
-	"github.com/henrylee2cn/pholcus/exec"
 	"github.com/ifls/gocore/io/file"
 	"github.com/ifls/gocore/util"
 	"log"
@@ -275,5 +273,5 @@ func TestYouling(t *testing.T) {
 	// 设置运行时默认操作界面，并开始运行
 	// 运行软件前，可设置 -a_ui 参数为"web"、"gui"或"cmd"，指定本次运行的操作界面
 	// 其中"gui"仅支持Windows系统
-	exec.DefaultRun("web")
+
 }

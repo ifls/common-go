@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.46.3
 	cloud.google.com/go/pubsub v1.0.1
 	cloud.google.com/go/storage v1.1.0
+	github.com/PuerkitoBio/goquery v1.5.0 // indirect
 	github.com/antchfx/htmlquery v1.0.0 // indirect
 	github.com/antchfx/xmlquery v1.0.0 // indirect
 	github.com/antchfx/xpath v1.0.0 // indirect
@@ -38,7 +39,6 @@ require (
 	github.com/hashicorp/serf v0.8.5 // indirect
 	github.com/henrylee2cn/cfgo v0.0.0-20180417024816-e6c3cc325b21 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20190925102525-a28b3dc837cc // indirect
-	github.com/henrylee2cn/pholcus v1.3.3
 	github.com/henrylee2cn/teleport v5.0.0+incompatible
 	github.com/jonboulle/clockwork v0.1.0 // indirect
 	github.com/json-iterator/go v1.1.7 // indirect
