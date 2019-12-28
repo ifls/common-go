@@ -6,7 +6,6 @@ require (
 	cloud.google.com/go v0.46.3
 	cloud.google.com/go/pubsub v1.0.1
 	cloud.google.com/go/storage v1.1.0
-	github.com/PuerkitoBio/goquery v1.5.0 // indirect
 	github.com/antchfx/htmlquery v1.0.0 // indirect
 	github.com/antchfx/xmlquery v1.0.0 // indirect
 	github.com/antchfx/xpath v1.0.0 // indirect
@@ -39,6 +38,7 @@ require (
 	github.com/hashicorp/serf v0.8.5 // indirect
 	github.com/henrylee2cn/cfgo v0.0.0-20180417024816-e6c3cc325b21 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20190925102525-a28b3dc837cc // indirect
+	github.com/henrylee2cn/pholcus v1.3.3
 	github.com/henrylee2cn/teleport v5.0.0+incompatible
 	github.com/jonboulle/clockwork v0.1.0 // indirect
 	github.com/json-iterator/go v1.1.7 // indirect
@@ -53,14 +53,11 @@ require (
 	github.com/tidwall/gjson v1.3.2 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
 	github.com/ufilesdk-dev/ufile-gosdk v0.0.0-20190830075812-b4dbc4ef43a6
-	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
-	github.com/xdg/stringprep v1.0.0 // indirect
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
 	go.etcd.io/bbolt v1.3.3 // indirect
 	go.mongodb.org/mongo-driver v1.1.1
 	go.uber.org/multierr v1.2.0 // indirect
 	go.uber.org/zap v1.10.0
-	golang.org/x/sys v0.0.0-20190624142023-c5567b49c5d0
 	google.golang.org/api v0.10.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1
