@@ -3,7 +3,7 @@ package socket
 import (
 	"fmt"
 	net2 "github.com/ifls/gocore/net"
-	"github.com/ifls/gocore/util"
+	"github.com/ifls/gocore/utils"
 	"go.uber.org/zap"
 	"log"
 	"net"
@@ -35,7 +35,7 @@ type TcpParams struct {
 func ServerMain(addr string, callback TcpCallback, params TcpParams) {
 	//启动监听器
 	listener, err := net.Listen(ProtocolTcp, addr)
-	util.LogErr(err, zap.String(util.LogTagReason, fmt.Sprintf("listen on %s->%s", ProtocolTcp, addr)))
+	utils.LogErr(err, zap.String(utils.LogTagReason, fmt.Sprintf("listen on %s->%s", ProtocolTcp, addr)))
 	log.Println(params)
 	defer func() {
 		err := listener.Close()
@@ -50,7 +50,7 @@ func ServerMain(addr string, callback TcpCallback, params TcpParams) {
 		conn, err := listener.Accept()
 
 		if err != nil {
-			util.LogErr(err, zap.String(util.LogTagReason, "listener.Accept()"))
+			utils.LogErr(err, zap.String(utils.LogTagReason, "listener.Accept()"))
 		} else {
 			//每个连接, 一个子协程进行对话
 			go handleConnect(conn, callback)
@@ -70,12 +70,12 @@ func handleConnect(conn net.Conn, callback TcpCallback) {
 	for {
 		n, err := conn.Read(readBuff)
 		if err != nil {
-			util.LogErr(err, zap.String(util.LogTagReason, "Conn.Read() err"))
+			utils.LogErr(err, zap.String(utils.LogTagReason, "Conn.Read() err"))
 			return
 		}
 
 		if n <= 0 {
-			util.LogErr(err, zap.String(util.LogTagReason, "Conn.Read() <=0 eof"))
+			utils.LogErr(err, zap.String(utils.LogTagReason, "Conn.Read() <=0 eof"))
 			return
 		}
 
@@ -143,7 +143,7 @@ func ClientMain(addr string) {
 		err := conn.Close()
 		log.Println(err)
 	}()
-	util.LogErr(err, zap.String("reason", "net.Dial"))
+	utils.LogErr(err, zap.String("reason", "net.Dial"))
 
 	//创建一个承载信息的桶
 	//bytearr := make([]byte, 1024)
@@ -161,7 +161,7 @@ func ClientMain(addr string) {
 		//	lineByte = append(lineByte, getPacket()...)
 		//}
 		//fmt.Printf("%s\n", string([]byte{0x00, 0x00, 0x00, 0x41}))
-		util.DevInfo("send to server:%v, len=%v\n", lineByte, len(lineByte))
+		utils.DevInfo("send to server:%v, len=%v\n", lineByte, len(lineByte))
 		count, err = conn.Write(lineByte)
 		if err != nil {
 			log.Println(err)

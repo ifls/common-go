@@ -3,7 +3,7 @@ package net
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/ifls/gocore/util"
+	"github.com/ifls/gocore/utils"
 	"strings"
 )
 
@@ -27,7 +27,7 @@ func Serve(addr string) error {
 		} else if typ == "get" {
 			r.GET(url, h)
 		} else {
-			util.LogErr(fmt.Errorf("find unmatched http method %s", typeUrl))
+			utils.LogErr(fmt.Errorf("find unmatched http method %s", typeUrl))
 			continue
 		}
 	}

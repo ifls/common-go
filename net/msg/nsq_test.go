@@ -3,7 +3,7 @@ package msg
 import (
 	"errors"
 	"fmt"
-	"github.com/ifls/gocore/util"
+	"github.com/ifls/gocore/utils"
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -299,7 +299,7 @@ func TestNsqProductor(t *testing.T) {
 	for {
 		fmt.Print("please say:")
 		//data, _, _ := reader.ReadLine()
-		command := strconv.Itoa(count) + "->" + util.GetTime()
+		command := strconv.Itoa(count) + "->" + utils.GetTime()
 
 		err := producer1.public(topic, command)
 		if err != nil {
@@ -317,10 +317,10 @@ type nsqProducer struct {
 
 //初始化生产者
 func initProducer(addr string) (*nsqProducer, error) {
-	util.DevInfo("init producer address:" + addr)
+	utils.DevInfo("init producer address:" + addr)
 	producer, err := nsq.NewProducer(addr, nsq.NewConfig())
 	if err != nil {
-		util.LogErr(err, zap.String("tag", "nsq.nsq.NewProducer"))
+		utils.LogErr(err, zap.String("tag", "nsq.nsq.NewProducer"))
 		return nil, err
 	}
 	return &nsqProducer{producer}, nil
@@ -385,7 +385,7 @@ func TestNsqPublishMessage(t *testing.T) {
 	i := 0
 	for i < 100000000 {
 		time.Sleep(2000 * time.Millisecond)
-		PublicMessage(topic, []byte(util.GetTime()+";"+strconv.Itoa(i)))
+		PublicMessage(topic, []byte(utils.GetTime()+";"+strconv.Itoa(i)))
 		i++
 	}
 
@@ -409,14 +409,14 @@ func TestNsq(t *testing.T) {
 
 		consumer, err := nsq.NewConsumer(topic, topic+"_testConsumer", nsq.NewConfig())
 		if nil != err {
-			util.LogErr(err)
+			utils.LogErr(err)
 			return
 		}
 
 		consumer.AddHandler(&NSQHandler{})
 		err = consumer.ConnectToNSQD(nsqAdminTcp)
 		if nil != err {
-			util.LogErr(err)
+			utils.LogErr(err)
 			return
 		}
 
@@ -430,7 +430,7 @@ func TestConsumer(t *testing.T) {
 	waiter := sync.WaitGroup{}
 	waiter.Add(1)
 	ConsumeMessage(topic, topic+"_testConsumer2", func(message *nsq.Message) error {
-		util.DevInfo("%s [%+v] %+v %+v\n", message.ID, string(message.Body), message.Timestamp, message.NSQDAddress)
+		utils.DevInfo("%s [%+v] %+v %+v\n", message.ID, string(message.Body), message.Timestamp, message.NSQDAddress)
 		message.Finish()
 		return nil
 	})

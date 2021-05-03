@@ -3,7 +3,7 @@ package redis
 import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
-	"github.com/ifls/gocore/util"
+	"github.com/ifls/gocore/utils"
 )
 
 var redisClient redis.Conn
@@ -13,7 +13,7 @@ var redisUrl string
 func Open(addr string) (redis.Conn, error) {
 	cli, err := redis.Dial("tcp", addr)
 	if err != nil {
-		util.LogErr(err)
+		utils.LogErr(err)
 		return nil, err
 	}
 

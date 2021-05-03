@@ -3,8 +3,8 @@ package net
 import (
 	"fmt"
 	"github.com/gocolly/colly"
-	"github.com/ifls/gocore/io/file"
-	"github.com/ifls/gocore/util"
+	"github.com/ifls/gocore/utils"
+	"github.com/ifls/gocore/x/io/file"
 	"log"
 	"os"
 	"strconv"
@@ -43,7 +43,7 @@ func init() {
 	visitQueue = append(visitQueue, "http://pic.netbian.com/tupian/1.html")
 	allowedDomains = make([]string, 0)
 	allowedDomains = append(allowedDomains, "netbian.com", "pic.netbian.com")
-	finalPath = "/Users/ifls/Downloads/logs/imgs/" + strconv.Itoa(int(util.NextId())) + "/"
+	finalPath = "/Users/ifls/Downloads/logs/imgs/" + strconv.Itoa(int(utils.NextId())) + "/"
 	err := os.Mkdir(finalPath, os.ModePerm)
 	if err != nil {
 		log.Println(err)
@@ -92,9 +92,9 @@ func onFindHtmlUrl(e *colly.HTMLElement) {
 			url:     url,
 			visited: false,
 		}
-		util.DevInfo("ONHTML Link found: %s\n", url)
+		utils.DevInfo("ONHTML Link found: %s\n", url)
 		visitQueue = append(visitQueue, url)
-		util.DevInfo("html len = %d\n", len(htmlUrls))
+		utils.DevInfo("html len = %d\n", len(htmlUrls))
 		return
 	}
 }
@@ -120,7 +120,7 @@ func downloadImgUrl(url string) {
 
 func OnResponse(response *colly.Response) {
 	url := response.Request.URL.String()
-	util.DevInfo("onResponse = %v", url)
+	utils.DevInfo("onResponse = %v", url)
 	url = isImageUrl(url)
 	if url == "" {
 		//util.DevInfo("onResponse url is not imgurl")
@@ -164,9 +164,9 @@ func scheVisit() {
 		_ = c.Visit(visitQueue[0])
 		visitQueue = visitQueue[1:]
 	} else {
-		util.LogError("visited end ")
+		utils.LogError("visited end ")
 		time.Sleep(100 * time.Millisecond)
-		util.DevInfo("htmlurl length = %d\n imgurl length = %d\n", len(htmlUrls), len(imgUrls))
+		utils.DevInfo("htmlurl length = %d\n imgurl length = %d\n", len(htmlUrls), len(imgUrls))
 	}
 
 	scheVisit()
@@ -196,7 +196,7 @@ func TestScrapy(t *testing.T) {
 	})
 
 	c.OnError(func(response *colly.Response, e error) {
-		util.DevInfo("onError=%v", e)
+		utils.DevInfo("onError=%v", e)
 	})
 
 	c.OnResponse(func(response *colly.Response) {
@@ -218,7 +218,7 @@ func TestScrapy(t *testing.T) {
 
 	c.OnScraped(func(response *colly.Response) {
 		url := response.Request.URL.String()
-		util.DevInfo("visit finished = %v\n", url)
+		utils.DevInfo("visit finished = %v\n", url)
 		if htmlUrls[url] != nil {
 			htmlUrls[url].visited = true
 		}
@@ -235,8 +235,8 @@ func WriteToGcpOss(response *colly.Response, imgUrl string) {
 	subfixs := strings.Split(lastStr, ".")
 	subfix := subfixs[len(subfixs)-1]
 
-	hashKey := util.Sha256Hash(data)
-	name := util.Base64Encoding(hashKey)
+	hashKey := utils.Sha256Hash(data)
+	name := utils.Base64Encoding(hashKey)
 	filename := name
 
 	filename = filename + "." + subfix
@@ -258,7 +258,7 @@ func WriteToGcpOss(response *colly.Response, imgUrl string) {
 		//}
 	})
 	if err != nil {
-		util.LogErr(err)
+		utils.LogErr(err)
 		return
 	}
 

@@ -1,7 +1,7 @@
 package net
 
 import (
-	"github.com/ifls/gocore/util"
+	"github.com/ifls/gocore/utils"
 	"go.uber.org/zap"
 	"io"
 	"log"
@@ -14,7 +14,7 @@ func CopyFile(w io.Reader, url string) {
 	path := "/Users/ifls/Downloads/logs/imgs/" + filname
 	f, err := os.Create(path)
 	if err != nil {
-		util.LogErr(err, zap.String("reason", "file create error"))
+		utils.LogErr(err, zap.String("reason", "file create error"))
 	}
 	defer func() {
 		err := f.Close()
@@ -24,9 +24,9 @@ func CopyFile(w io.Reader, url string) {
 	}()
 
 	if _, err = io.Copy(f, w); err != nil {
-		util.LogErr(err, zap.String("reason", "data copy error"))
+		utils.LogErr(err, zap.String("reason", "data copy error"))
 	}
 	if err := f.Close(); err != nil {
-		util.LogErr(err, zap.String("reason", "file close error"))
+		utils.LogErr(err, zap.String("reason", "file close error"))
 	}
 }

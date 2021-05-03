@@ -2,7 +2,7 @@ package mongo
 
 import (
 	"context"
-	"github.com/ifls/gocore/util"
+	"github.com/ifls/gocore/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -25,18 +25,18 @@ func init() {
 	url := "mongodb://47.107.151.251:27017"
 	client, err := NewClient(url)
 	if err != nil {
-		util.LogErr(err)
+		utils.LogErr(err)
 	}
 	testMongoClient = client
 }
 
 func TestMongoApiInsert(t *testing.T) {
-	rd := int(util.NextId()) % 1000000
+	rd := int(utils.NextId()) % 1000000
 	user := MongoUser{
 		Uid:       rd,
 		Name:      "user" + strconv.Itoa(rd),
 		Password:  "www",
-		LoginTime: time.Now().Format(util.TimeFormat),
+		LoginTime: time.Now().Format(utils.TimeFormat),
 	}
 	user2 := user
 	user2.Password = "ccc"
@@ -47,12 +47,12 @@ func TestMongoApiInsert(t *testing.T) {
 }
 
 func TestMongoApiFindOne(t *testing.T) {
-	rd := int(util.NextId()) % 1000000
+	rd := int(utils.NextId()) % 1000000
 	user := MongoUser{
 		Uid:       rd,
 		Name:      "user" + strconv.Itoa(rd),
 		Password:  "www",
-		LoginTime: time.Now().Format(util.TimeFormat),
+		LoginTime: time.Now().Format(utils.TimeFormat),
 	}
 	err := testMongoClient.Insert(testDb, "user", user)
 	if err != nil {
@@ -67,9 +67,9 @@ func TestMongoApiFindOne(t *testing.T) {
 	log.Printf("mongo.singleResult = %#v\n", ret)
 	var user1 MongoUser
 	if err := ret.Decode(&user1); err != nil {
-		util.LogErr(err)
+		utils.LogErr(err)
 	}
-	util.DevInfo("%+v\n", user1)
+	utils.DevInfo("%+v\n", user1)
 }
 
 func TestMongoApiFind(t *testing.T) {
@@ -82,9 +82,9 @@ func TestMongoApiFind(t *testing.T) {
 	for cur.Next(ctx) {
 		var user1 MongoUser
 		if err := cur.Decode(&user1); err != nil {
-			util.LogErr(err)
+			utils.LogErr(err)
 		}
-		util.DevInfo("%+v\n", user1)
+		utils.DevInfo("%+v\n", user1)
 	}
 }
 
@@ -97,7 +97,7 @@ func TestMongoUpdateOne(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	util.DevInfo("update one result %+v\n", ret)
+	utils.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoUpdateMany(t *testing.T) {
@@ -109,7 +109,7 @@ func TestMongoUpdateMany(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	util.DevInfo("update one result %+v\n", ret)
+	utils.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoApiUpdate(t *testing.T) {
@@ -123,10 +123,10 @@ func TestMongoApiUpdate(t *testing.T) {
 
 func TestMongoReplaceOne(t *testing.T) {
 	user := MongoUser{
-		Uid:       int(util.NextId()) % 1000000,
+		Uid:       int(utils.NextId()) % 1000000,
 		Name:      "user100332x",
 		Password:  "www",
-		LoginTime: time.Now().Format(util.TimeFormat),
+		LoginTime: time.Now().Format(utils.TimeFormat),
 	}
 
 	ret, err := testMongoClient.ReplaceOne(testDb, "user", bson.M{"password": "www"}, user)
@@ -134,7 +134,7 @@ func TestMongoReplaceOne(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	util.DevInfo("replaceOne %+v\n", ret)
+	utils.DevInfo("replaceOne %+v\n", ret)
 }
 
 func TestMongoDeleteOne(t *testing.T) {
@@ -146,7 +146,7 @@ func TestMongoDeleteOne(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	util.DevInfo("update one result %+v\n", ret)
+	utils.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoDelete(t *testing.T) {
@@ -158,7 +158,7 @@ func TestMongoDelete(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	util.DevInfo("update one result %+v\n", ret)
+	utils.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoApiDelete(t *testing.T) {
@@ -185,7 +185,7 @@ func TestMongoAggregate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	util.DevInfo("update one result %+v\n", curs)
+	utils.DevInfo("update one result %+v\n", curs)
 	if curs == nil {
 		t.Fatal("nil")
 	}
@@ -202,8 +202,8 @@ func TestMongoAggregate(t *testing.T) {
 		}
 
 		if err := curs.Decode(&user1); err != nil {
-			util.LogErr(err)
+			utils.LogErr(err)
 		}
-		util.DevInfo("%+v\n", user1)
+		utils.DevInfo("%+v\n", user1)
 	}
 }
