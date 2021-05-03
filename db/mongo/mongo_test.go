@@ -22,7 +22,7 @@ var testMongoClient Client
 var testDb string = "test"
 
 func init() {
-	url := "mongodb://23.91.101.147:27017"
+	url := "mongodb://47.107.151.251:27017"
 	client, err := NewClient(url)
 	if err != nil {
 		util.LogErr(err)

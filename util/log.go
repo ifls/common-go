@@ -167,7 +167,7 @@ func InitLogger(l *zap.Logger) bool {
 func LogDebug(msg string, fields ...zap.Field) {
 	logger.Debug(msg, fields...)
 	if err := logger.Sync(); err != nil {
-		log.Println(err)
+		//log.Println(err)
 	}
 
 }
@@ -175,21 +175,21 @@ func LogDebug(msg string, fields ...zap.Field) {
 func LogInfo(msg string, fields ...zap.Field) {
 	logger.Info(msg, fields...)
 	if err := logger.Sync(); err != nil {
-		log.Println(err)
+		//log.Println(err)
 	}
 }
 
 func LogWarn(msg string, fields ...zap.Field) {
 	logger.Warn(msg, fields...)
 	if err := logger.Sync(); err != nil {
-		log.Println(err)
+		//log.Println(err)
 	}
 }
 
 func LogError(msg string, fields ...zap.Field) {
 	logger.Error(msg, fields...)
 	if err := logger.Sync(); err != nil {
-		log.Println(err)
+		//log.Println(err)
 	}
 }
 
@@ -197,7 +197,7 @@ func LogFatal(msg string, fields ...zap.Field) {
 	logger.Fatal(msg, fields...)
 	defer func() {
 		if err := logger.Sync(); err != nil {
-			log.Println(err)
+			//log.Println(err)
 		}
 	}()
 }
@@ -207,7 +207,7 @@ func LogDebugf(msg string, fields ...interface{}) {
 	logger.Sugar().Debugf(msg, fields...)
 	defer func() {
 		if err := logger.Sync(); err != nil {
-			log.Println(err)
+			//log.Println(err)
 		}
 	}()
 }
@@ -217,7 +217,7 @@ func LogErr(err error, fields ...zap.Field) {
 		//LogStack()
 		logger.Error("error = "+err.Error(), fields...)
 		if err := logger.Sync(); err != nil {
-			log.Println(err)
+			//log.Println(err)
 		}
 	}
 }
@@ -231,7 +231,7 @@ func RetErr(err error, format string, a ...interface{}) error {
 func Log(level int, msg string, fields ...zap.Field) {
 	defer func() {
 		if err := logger.Sync(); err != nil {
-			log.Println(err)
+			//log.Println(err)
 		}
 	}()
 
@@ -255,7 +255,7 @@ func LogErrAndExit(err error, fields ...zap.Field) {
 	if err != nil {
 		defer func() {
 			if err := logger.Sync(); err != nil {
-				log.Println(err)
+				//log.Println(err)
 			}
 		}()
 		logger.Fatal("FATAL="+err.Error(), fields...)

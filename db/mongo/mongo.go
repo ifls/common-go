@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"time"
 )
 
@@ -36,10 +35,10 @@ func NewClient(mongoUrl string) (Client, error) {
 		return Client{}, fmt.Errorf("client.connect err =%w, url = %s\n", err, mongoUrl)
 	}
 
-	err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		return Client{}, fmt.Errorf("client.Ping err =%w, url = %s\n", err, mongoUrl)
-	}
+	//err = client.Ping(ctx, readpref.Primary())
+	//if err != nil {
+	//	return Client{}, fmt.Errorf("client.Ping err =%w, url = %s\n", err, mongoUrl)
+	//}
 	return Client{client}, nil
 }
 
