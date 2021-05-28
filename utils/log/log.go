@@ -1,7 +1,8 @@
-package utils
+package log
 
 import (
 	"fmt"
+	"github.com/ifls/gocore/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -19,7 +20,9 @@ const (
 	LogTagReason = "reason"
 )
 
-var logDir string
+var (
+	logDir string
+)
 
 func init() {
 	switch runtime.GOOS {
@@ -50,7 +53,7 @@ func InitLogTest(lw io.Writer, conn net.Conn) {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // 小写编码器
-		EncodeTime:     TimeEncoder,                      // yyyy-mm-dd hh-mm-ss.xxxxxx
+		EncodeTime:     utils.TimeEncoder,                // yyyy-mm-dd hh-mm-ss.xxxxxx
 		EncodeDuration: zapcore.SecondsDurationEncoder,   //
 		EncodeCaller:   nil,                              // 全路径编码器
 		EncodeName:     zapcore.FullNameEncoder,
@@ -100,7 +103,7 @@ func Initdefault() {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // 小写编码器
-		EncodeTime:     TimeEncoder,                      // yyyy-mm-dd hh-mm-ss.xxxxxx
+		EncodeTime:     utils.TimeEncoder,                // yyyy-mm-dd hh-mm-ss.xxxxxx
 		EncodeDuration: zapcore.SecondsDurationEncoder,   //
 		EncodeCaller:   zapcore.ShortCallerEncoder,       // 全路径编码器
 		EncodeName:     zapcore.FullNameEncoder,

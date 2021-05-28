@@ -3,6 +3,7 @@ package utils
 import (
 	"github.com/bwmarrin/snowflake"
 	"github.com/google/uuid"
+	log2 "github.com/ifls/gocore/utils/log"
 	"log"
 	"os"
 )
@@ -43,7 +44,7 @@ func NextId() int64 {
 func UuidBinary() []byte {
 	data, err := uuid.New().MarshalBinary()
 	if err != nil {
-		LogErr(err)
+		log2.LogErr(err)
 		return nil
 	}
 	return data
@@ -52,7 +53,7 @@ func UuidBinary() []byte {
 func UuidText() string {
 	data, err := uuid.New().MarshalText()
 	if err != nil {
-		LogErr(err)
+		log2.LogErr(err)
 		return ""
 	}
 	return string(data)

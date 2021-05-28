@@ -3,6 +3,7 @@ package file
 import (
 	"fmt"
 	"github.com/ifls/gocore/utils"
+	"github.com/ifls/gocore/utils/log"
 	"gopkg.in/go-playground/assert.v1"
 	"testing"
 )
@@ -10,8 +11,8 @@ import (
 func TestReadFile(t *testing.T) {
 	filepath := "/Users/ifls/test.jpg"
 	data, err := ReadFile(filepath)
-	utils.DevInfo("%v", data)
-	utils.LogErr(err)
+	log.DevInfo("%v", data)
+	log.LogErr(err)
 	t.Error(WriteFile(data, "./test.jpg"))
 }
 

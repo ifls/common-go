@@ -1,6 +1,7 @@
 package utils
 
 import (
+	log2 "github.com/ifls/gocore/utils/log"
 	"log"
 	"os"
 	"runtime"
@@ -30,7 +31,7 @@ func PrintOsInfo() {
 	log.Printf("group id os.Getgid() = %#v\n", os.Getgid())
 	ints, err := os.Getgroups()
 	if err != nil {
-		LogErr(err)
+		log2.LogErr(err)
 		return
 	}
 	log.Printf("os.Getgroups() = %#v\n", ints)
@@ -39,7 +40,7 @@ func PrintOsInfo() {
 	log.Printf("os.Getuid() = %#v\n", os.Getuid())
 	dir, err := os.Getwd()
 	if err != nil {
-		LogErr(err)
+		log2.LogErr(err)
 		return
 	}
 	log.Printf("os.Getwd() = %#v\n", dir)

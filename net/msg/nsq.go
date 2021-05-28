@@ -1,7 +1,7 @@
 package msg
 
 import (
-	"github.com/ifls/gocore/utils"
+	log2 "github.com/ifls/gocore/utils/log"
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"
 	"log"
@@ -34,7 +34,7 @@ func init() {
 func createProducer(addr string) *nsq.Producer {
 	producer, err := nsq.NewProducer(addr, nsq.NewConfig())
 	if err != nil {
-		utils.LogErr(err, zap.String("reason", "nsq.createProducer"))
+		log2.LogErr(err, zap.String("reason", "nsq.createProducer"))
 		return nil
 	}
 	return producer
@@ -45,7 +45,7 @@ func Consumer(topic string, channel string, addr string) error {
 	cfg.LookupdPollInterval = 100000 * time.Millisecond
 	c, err := nsq.NewConsumer(topic, channel, cfg)
 	if err != nil {
-		utils.LogErr(err, zap.String("reason", "nsq.NewConsumer"))
+		log2.LogErr(err, zap.String("reason", "nsq.NewConsumer"))
 		return err
 	}
 
@@ -53,7 +53,7 @@ func Consumer(topic string, channel string, addr string) error {
 
 	err = c.ConnectToNSQLookupd(addr)
 	if err != nil {
-		utils.LogErr(err, zap.String("reason", "nsq.consumer.ConnectToNSQLookupd()"))
+		log2.LogErr(err, zap.String("reason", "nsq.consumer.ConnectToNSQLookupd()"))
 		return err
 	}
 	return nil
@@ -77,7 +77,7 @@ type H struct {
 //处理消息
 func (h *H) HandleMessage(msg *nsq.Message) error {
 	received++
-	utils.DevInfo("receive ID:%s,addr:%s,message:%s", msg.ID, msg.NSQDAddress, string(msg.Body))
+	log2.DevInfo("receive ID:%s,addr:%s,message:%s", msg.ID, msg.NSQDAddress, string(msg.Body))
 
 	for _, h := range mhs {
 		if h != nil {
@@ -93,7 +93,7 @@ func (h *H) HandleMessage(msg *nsq.Message) error {
 //data:数据
 func PublicMessage(topic string, data []byte) {
 	msg := string(data)
-	utils.DevInfo("PublicMessage message = " + msg)
+	log2.DevInfo("PublicMessage message = " + msg)
 
 	//
 	if producer == nil {
@@ -106,7 +106,7 @@ func PublicMessage(topic string, data []byte) {
 	//发布消息
 	err := producer.Publish(topic, data)
 	if err != nil {
-		utils.LogErr(err, zap.String("reason", "nsq.PublicMessage"))
+		log2.LogErr(err, zap.String("reason", "nsq.PublicMessage"))
 		return
 	}
 }
@@ -126,7 +126,7 @@ func (n *NSQHandler) HandleMessage(message *nsq.Message) error {
 func ConsumeMessage(topic string, channel string, handler func(*nsq.Message) error) {
 	consumer, err := nsq.NewConsumer(topic, channel, nsq.NewConfig())
 	if nil != err {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return
 	}
 
@@ -135,7 +135,7 @@ func ConsumeMessage(topic string, channel string, handler func(*nsq.Message) err
 	consumer.AddHandler(&nh)
 	err = consumer.ConnectToNSQD(nsqAdminTcp)
 	if nil != err {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return
 	}
 }

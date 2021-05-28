@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ifls/gocore/utils"
+	log2 "github.com/ifls/gocore/utils/log"
 	"github.com/nsqio/go-nsq"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -317,10 +318,10 @@ type nsqProducer struct {
 
 //初始化生产者
 func initProducer(addr string) (*nsqProducer, error) {
-	utils.DevInfo("init producer address:" + addr)
+	log2.DevInfo("init producer address:" + addr)
 	producer, err := nsq.NewProducer(addr, nsq.NewConfig())
 	if err != nil {
-		utils.LogErr(err, zap.String("tag", "nsq.nsq.NewProducer"))
+		log2.LogErr(err, zap.String("tag", "nsq.nsq.NewProducer"))
 		return nil, err
 	}
 	return &nsqProducer{producer}, nil
@@ -409,14 +410,14 @@ func TestNsq(t *testing.T) {
 
 		consumer, err := nsq.NewConsumer(topic, topic+"_testConsumer", nsq.NewConfig())
 		if nil != err {
-			utils.LogErr(err)
+			log2.LogErr(err)
 			return
 		}
 
 		consumer.AddHandler(&NSQHandler{})
 		err = consumer.ConnectToNSQD(nsqAdminTcp)
 		if nil != err {
-			utils.LogErr(err)
+			log2.LogErr(err)
 			return
 		}
 
@@ -430,7 +431,7 @@ func TestConsumer(t *testing.T) {
 	waiter := sync.WaitGroup{}
 	waiter.Add(1)
 	ConsumeMessage(topic, topic+"_testConsumer2", func(message *nsq.Message) error {
-		utils.DevInfo("%s [%+v] %+v %+v\n", message.ID, string(message.Body), message.Timestamp, message.NSQDAddress)
+		log2.DevInfo("%s [%+v] %+v %+v\n", message.ID, string(message.Body), message.Timestamp, message.NSQDAddress)
 		message.Finish()
 		return nil
 	})

@@ -2,7 +2,7 @@ package conf
 
 import (
 	"github.com/coreos/etcd/clientv3"
-	"github.com/ifls/gocore/utils"
+	"github.com/ifls/gocore/utils/log"
 	"gopkg.in/go-playground/assert.v1"
 	"testing"
 	"time"
@@ -16,7 +16,7 @@ func TestEtcdConnect(t *testing.T) {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return
 	}
 	defer cli.Close()
@@ -28,7 +28,7 @@ func TestEtcdPut(t *testing.T) {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return
 	}
 	defer cli.Close()
@@ -48,7 +48,7 @@ func TestEtcdGet(t *testing.T) {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return
 	}
 	defer cli.Close()
@@ -57,5 +57,5 @@ func TestEtcdGet(t *testing.T) {
 
 	data, _ := get(key)
 
-	utils.DevInfo("key = %s, val = [%s]", key, string(data))
+	log.DevInfo("key = %s, val = [%s]", key, string(data))
 }

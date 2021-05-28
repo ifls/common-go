@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/ifls/gocore/utils"
+	"github.com/ifls/gocore/utils/log"
 	"time"
 )
 
@@ -57,7 +57,7 @@ func Ping() error {
 func open() (db *sql.DB) {
 	db, err := sql.Open("mysql", tidbUrl)
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return nil
 	}
 	return db

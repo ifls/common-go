@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"github.com/ifls/gocore/utils"
+	log2 "github.com/ifls/gocore/utils/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -25,7 +26,7 @@ func init() {
 	url := "mongodb://47.107.151.251:27017"
 	client, err := NewClient(url)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 	}
 	testMongoClient = client
 }
@@ -67,9 +68,9 @@ func TestMongoApiFindOne(t *testing.T) {
 	log.Printf("mongo.singleResult = %#v\n", ret)
 	var user1 MongoUser
 	if err := ret.Decode(&user1); err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 	}
-	utils.DevInfo("%+v\n", user1)
+	log2.DevInfo("%+v\n", user1)
 }
 
 func TestMongoApiFind(t *testing.T) {
@@ -82,9 +83,9 @@ func TestMongoApiFind(t *testing.T) {
 	for cur.Next(ctx) {
 		var user1 MongoUser
 		if err := cur.Decode(&user1); err != nil {
-			utils.LogErr(err)
+			log2.LogErr(err)
 		}
-		utils.DevInfo("%+v\n", user1)
+		log2.DevInfo("%+v\n", user1)
 	}
 }
 
@@ -97,7 +98,7 @@ func TestMongoUpdateOne(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	utils.DevInfo("update one result %+v\n", ret)
+	log2.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoUpdateMany(t *testing.T) {
@@ -109,7 +110,7 @@ func TestMongoUpdateMany(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	utils.DevInfo("update one result %+v\n", ret)
+	log2.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoApiUpdate(t *testing.T) {
@@ -134,7 +135,7 @@ func TestMongoReplaceOne(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	utils.DevInfo("replaceOne %+v\n", ret)
+	log2.DevInfo("replaceOne %+v\n", ret)
 }
 
 func TestMongoDeleteOne(t *testing.T) {
@@ -146,7 +147,7 @@ func TestMongoDeleteOne(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	utils.DevInfo("update one result %+v\n", ret)
+	log2.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoDelete(t *testing.T) {
@@ -158,7 +159,7 @@ func TestMongoDelete(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	utils.DevInfo("update one result %+v\n", ret)
+	log2.DevInfo("update one result %+v\n", ret)
 }
 
 func TestMongoApiDelete(t *testing.T) {
@@ -185,7 +186,7 @@ func TestMongoAggregate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	utils.DevInfo("update one result %+v\n", curs)
+	log2.DevInfo("update one result %+v\n", curs)
 	if curs == nil {
 		t.Fatal("nil")
 	}
@@ -202,8 +203,8 @@ func TestMongoAggregate(t *testing.T) {
 		}
 
 		if err := curs.Decode(&user1); err != nil {
-			utils.LogErr(err)
+			log2.LogErr(err)
 		}
-		utils.DevInfo("%+v\n", user1)
+		log2.DevInfo("%+v\n", user1)
 	}
 }

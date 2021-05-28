@@ -5,7 +5,7 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
-	"github.com/ifls/gocore/utils"
+	"github.com/ifls/gocore/utils/log"
 	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
@@ -30,7 +30,7 @@ func init() {
 	ctx := context.Background()
 	client, err = storage.NewClient(ctx)
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return
 	}
 }
@@ -56,21 +56,21 @@ func WriteGcpOss(data []byte, bucket string, object string, cb OnUploadSucc) err
 }
 
 func WriteGcpOssFromReader(reader io.Reader, bucket string, object string, cb OnUploadSucc) error {
-	utils.LogInfo("write to gcp oss", zap.String("bucket", bucket), zap.String("objectName", object))
+	log.LogInfo("write to gcp oss", zap.String("bucket", bucket), zap.String("objectName", object))
 	ctx := context.Background()
 
 	wc := client.Bucket(bucket).Object(object).NewWriter(ctx)
 	if _, err := io.Copy(wc, reader); err != nil {
-		utils.LogErr(err, zap.String("reason", "copy to gcp oss error"))
+		log.LogErr(err, zap.String("reason", "copy to gcp oss error"))
 		return err
 	}
 	if err := wc.Close(); err != nil {
-		utils.LogErr(err, zap.String("reason", "gcp oss close error"))
+		log.LogErr(err, zap.String("reason", "gcp oss close error"))
 		return err
 	}
 
 	if cb != nil {
-		utils.LogInfo("write to gcp oss cb", zap.String("bucket", bucket), zap.String("objectName", object))
+		log.LogInfo("write to gcp oss cb", zap.String("bucket", bucket), zap.String("objectName", object))
 		cb(GcpOssUrl + bucket + "/" + object)
 	}
 
@@ -82,7 +82,7 @@ func ReadGcpOss(bucket string, object string) ([]byte, error) {
 
 	rc, err := client.Bucket(bucket).Object(object).NewReader(ctx)
 	if err != nil {
-		utils.LogErr(err, zap.String("reason", "read from gcp oss error"))
+		log.LogErr(err, zap.String("reason", "read from gcp oss error"))
 		return nil, err
 	}
 	defer func() {
@@ -91,7 +91,7 @@ func ReadGcpOss(bucket string, object string) ([]byte, error) {
 
 	data, err := ioutil.ReadAll(rc)
 	if err != nil {
-		utils.LogErr(err, zap.String("reason", "ioutil.ReadAll() from gcp oss error"))
+		log.LogErr(err, zap.String("reason", "ioutil.ReadAll() from gcp oss error"))
 		return nil, err
 	}
 	return data, nil

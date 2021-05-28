@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ifls/gocore/utils"
+	log2 "github.com/ifls/gocore/utils/log"
 	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
@@ -27,7 +28,7 @@ func Exist(filename string) bool {
 func IsDir(path string) bool {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return false
 	}
 	return fileInfo.IsDir()
@@ -36,7 +37,7 @@ func IsDir(path string) bool {
 func IsFile(path string) bool {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return false
 	}
 	return !fileInfo.IsDir()
@@ -78,7 +79,7 @@ func ReadlinesBuf(filepath string) ([]string, error) {
 	// 使用bufio
 	fd, err := os.Open(filepath)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return nil, err
 	}
 	defer func() {
@@ -105,13 +106,13 @@ func ReadlinesBuf(filepath string) ([]string, error) {
 func Write(data []byte, writer io.Writer) error {
 	n, err := writer.Write(data)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 
 	if n <= 0 || len(data) != n {
 		errStr := fmt.Sprintf("write error, want write %d, but writed length = %d", len(data), n)
-		utils.LogError(errStr)
+		log2.LogError(errStr)
 		return errors.New(errStr)
 	}
 
@@ -121,7 +122,7 @@ func Write(data []byte, writer io.Writer) error {
 func WriteFile(data []byte, path string) error {
 	err := ioutil.WriteFile(path, data, 0666)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 	return nil
@@ -139,7 +140,7 @@ func writeGcpUrl(data []byte, url string) error {
 	strs := strings.Split(url, ":")
 	err := WriteGcpOss(data, strs[0], strs[1], nil)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 	return nil
@@ -149,12 +150,12 @@ func writeGcpUrl(data []byte, url string) error {
 func ReadFile(path string) ([]byte, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return nil, err
 	}
 
 	if len(data) <= 0 {
-		utils.LogError("read file eof", zap.Int("read byte []", len(data)), zap.String("filepath", path))
+		log2.LogError("read file eof", zap.Int("read byte []", len(data)), zap.String("filepath", path))
 		return nil, errors.New("read file eof")
 	}
 
@@ -165,13 +166,13 @@ func Read(reader io.Reader) ([]byte, error) {
 	data := make([]byte, 0)
 	n, err := reader.Read(data)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return nil, err
 	}
 
 	if n <= 0 {
 		errStr := fmt.Sprintf("read EOF or error, read byte length = %d", n)
-		utils.LogError(errStr)
+		log2.LogError(errStr)
 		return nil, errors.New(errStr)
 	}
 
@@ -189,7 +190,7 @@ func readGcpOssUrl(url string) ([]byte, error) {
 	strs := strings.Split(url, ":")
 	data, err := ReadGcpOss(strs[0], strs[1])
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return nil, err
 	}
 	return data, nil
@@ -199,13 +200,13 @@ func readGcpOssUrl(url string) ([]byte, error) {
 func downloadGcpOss(bucket string, object string, path string) error {
 	data, err := ReadGcpOss(bucket, object)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 
 	err = WriteFile(data, path)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 	return nil
@@ -214,13 +215,13 @@ func downloadGcpOss(bucket string, object string, path string) error {
 func uploadGcpOss(path, bucket, object string) error {
 	data, err := ReadFile(path)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 
 	err = WriteGcpOss(data, bucket, object, nil)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 	return nil
@@ -229,7 +230,7 @@ func uploadGcpOss(path, bucket, object string) error {
 func uploadGcpOssName(path, bucket string) error {
 	data, err := ReadFile(path)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 
@@ -247,7 +248,7 @@ func uploadGcpOssName(path, bucket string) error {
 
 	err = WriteGcpOss(data, bucket, object, nil)
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return err
 	}
 	return nil

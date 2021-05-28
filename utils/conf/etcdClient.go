@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/coreos/etcd/clientv3"
-	"github.com/ifls/gocore/utils"
+	"github.com/ifls/gocore/utils/log"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func connectEtcd() (*clientv3.Client, error) {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return nil, err
 	}
 	return cli, nil
@@ -36,11 +36,11 @@ func put(key string, value string) error {
 	resp, err := defaultClient.Put(ctx, key, value)
 	cancel()
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return err
 	}
 
-	utils.DevInfo("%+v\n", resp)
+	log.DevInfo("%+v\n", resp)
 	return nil
 }
 
@@ -49,13 +49,13 @@ func get(key string) ([]byte, error) {
 	resp, err := defaultClient.Get(ctx, key)
 	cancel()
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return nil, err
 	}
 
-	utils.DevInfo("%+v\n", resp.Kvs)
+	log.DevInfo("%+v\n", resp.Kvs)
 	for _, v := range resp.Kvs {
-		utils.DevInfo("%s\n", v.Value)
+		log.DevInfo("%s\n", v.Value)
 		return v.Value, nil
 	}
 	return nil, errors.New("key not found value")

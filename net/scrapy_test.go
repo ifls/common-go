@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gocolly/colly"
 	"github.com/ifls/gocore/utils"
+	log2 "github.com/ifls/gocore/utils/log"
 	"github.com/ifls/gocore/x/io/file"
 	"log"
 	"os"
@@ -92,9 +93,9 @@ func onFindHtmlUrl(e *colly.HTMLElement) {
 			url:     url,
 			visited: false,
 		}
-		utils.DevInfo("ONHTML Link found: %s\n", url)
+		log2.DevInfo("ONHTML Link found: %s\n", url)
 		visitQueue = append(visitQueue, url)
-		utils.DevInfo("html len = %d\n", len(htmlUrls))
+		log2.DevInfo("html len = %d\n", len(htmlUrls))
 		return
 	}
 }
@@ -120,7 +121,7 @@ func downloadImgUrl(url string) {
 
 func OnResponse(response *colly.Response) {
 	url := response.Request.URL.String()
-	utils.DevInfo("onResponse = %v", url)
+	log2.DevInfo("onResponse = %v", url)
 	url = isImageUrl(url)
 	if url == "" {
 		//util.DevInfo("onResponse url is not imgurl")
@@ -164,9 +165,9 @@ func scheVisit() {
 		_ = c.Visit(visitQueue[0])
 		visitQueue = visitQueue[1:]
 	} else {
-		utils.LogError("visited end ")
+		log2.LogError("visited end ")
 		time.Sleep(100 * time.Millisecond)
-		utils.DevInfo("htmlurl length = %d\n imgurl length = %d\n", len(htmlUrls), len(imgUrls))
+		log2.DevInfo("htmlurl length = %d\n imgurl length = %d\n", len(htmlUrls), len(imgUrls))
 	}
 
 	scheVisit()
@@ -196,7 +197,7 @@ func TestScrapy(t *testing.T) {
 	})
 
 	c.OnError(func(response *colly.Response, e error) {
-		utils.DevInfo("onError=%v", e)
+		log2.DevInfo("onError=%v", e)
 	})
 
 	c.OnResponse(func(response *colly.Response) {
@@ -218,7 +219,7 @@ func TestScrapy(t *testing.T) {
 
 	c.OnScraped(func(response *colly.Response) {
 		url := response.Request.URL.String()
-		utils.DevInfo("visit finished = %v\n", url)
+		log2.DevInfo("visit finished = %v\n", url)
 		if htmlUrls[url] != nil {
 			htmlUrls[url].visited = true
 		}
@@ -258,7 +259,7 @@ func WriteToGcpOss(response *colly.Response, imgUrl string) {
 		//}
 	})
 	if err != nil {
-		utils.LogErr(err)
+		log2.LogErr(err)
 		return
 	}
 

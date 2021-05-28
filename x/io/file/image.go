@@ -2,7 +2,7 @@ package file
 
 import (
 	"bytes"
-	"github.com/ifls/gocore/utils"
+	"github.com/ifls/gocore/utils/log"
 	"image"
 	"image/jpeg"
 )
@@ -14,10 +14,10 @@ func GetImageFileInfo(data []byte) (point image.Point) {
 
 	img, err := jpeg.Decode(&bs)
 	if err != nil {
-		utils.LogErr(err)
+		log.LogErr(err)
 		return
 	}
 
-	utils.DevInfo("%+v\n", img.Bounds())
+	log.DevInfo("%+v\n", img.Bounds())
 	return img.Bounds().Max
 }

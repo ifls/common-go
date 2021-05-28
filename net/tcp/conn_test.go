@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/ifls/gocore/utils"
+	log2 "github.com/ifls/gocore/utils/log"
 	"go.uber.org/zap"
 	"log"
 	"net"
@@ -53,7 +53,7 @@ func TestTcpClient(t *testing.T) {
 		err := conn.Close()
 		log.Println(err)
 	}()
-	utils.LogErr(err, zap.String("reason", "net.Dial"))
+	log2.LogErr(err, zap.String("reason", "net.Dial"))
 
 	//创建一个承载信息的桶
 	count := 0
