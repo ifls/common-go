@@ -53,7 +53,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/temoto/robotstxt v1.1.1 // indirect
-	github.com/tidwall/gjson v1.3.2 // indirect
+	github.com/tidwall/gjson v1.9.3 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
 	github.com/ufilesdk-dev/ufile-gosdk v0.0.0-20190830075812-b4dbc4ef43a6
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
